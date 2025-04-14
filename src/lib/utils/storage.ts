@@ -7,10 +7,20 @@ type StorageData = {
 	batteryKwh: number;
 	consumptionKwhPer100km: number;
 	usableFraction: number;
+	initialCharge: number;
+	targetCharge: number;
+	chargingPower: number;
+	chargingEfficiency: number;
 	theme: 'light' | 'dark';
 };
 
-export const defaultValues: StorageData = DEFAULT_VALUES;
+export const defaultValues: StorageData = {
+	...DEFAULT_VALUES,
+	initialCharge: 20,
+	targetCharge: 80,
+	chargingPower: 11,
+	chargingEfficiency: 90
+};
 
 export function saveData(data: Partial<StorageData>): void {
 	if (typeof window === 'undefined' || typeof localStorage === 'undefined') return;
@@ -67,6 +77,26 @@ export function getData(): StorageData {
 				typeof parsedData.usableFraction === 'number' && !isNaN(parsedData.usableFraction)
 					? parsedData.usableFraction
 					: defaultValues.usableFraction,
+
+			initialCharge:
+				typeof parsedData.initialCharge === 'number' && !isNaN(parsedData.initialCharge)
+					? parsedData.initialCharge
+					: defaultValues.initialCharge,
+
+			targetCharge:
+				typeof parsedData.targetCharge === 'number' && !isNaN(parsedData.targetCharge)
+					? parsedData.targetCharge
+					: defaultValues.targetCharge,
+
+			chargingPower:
+				typeof parsedData.chargingPower === 'number' && !isNaN(parsedData.chargingPower)
+					? parsedData.chargingPower
+					: defaultValues.chargingPower,
+
+			chargingEfficiency:
+				typeof parsedData.chargingEfficiency === 'number' && !isNaN(parsedData.chargingEfficiency)
+					? parsedData.chargingEfficiency
+					: defaultValues.chargingEfficiency,
 
 			theme:
 				parsedData.theme === 'dark' || parsedData.theme === 'light'
