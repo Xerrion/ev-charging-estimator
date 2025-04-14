@@ -17,7 +17,7 @@
 	];
 </script>
 
-<nav class="w-full overflow-x-auto">
+<nav class="overflow-x-auto">
 	<div class="tabs tabs-boxed w-full">
 		{#each navItems as item}
 			{@const isActive = $page.url.pathname === item.path}

@@ -4,13 +4,14 @@
 	import { INPUT_RANGES } from '$lib/utils/constants';
 	import { getFrequencyTips, getErrorTips } from '$lib/utils/tips';
 	import { onMount } from 'svelte';
-	import RangeInputSkeleton from '$lib/components/ui/RangeInputSkeleton.svelte';
-	import StatsSkeleton from '$lib/components/ui/StatsSkeleton.svelte';
-	import TipsSkeleton from '$lib/components/ui/TipsSkeleton.svelte';
+	import RangeInputSkeleton from '$lib/components/ui/skeletons/RangeInputSkeleton.svelte';
+	import StatsSkeleton from '$lib/components/ui/skeletons/StatsSkeleton.svelte';
+	import TipsSkeleton from '$lib/components/ui/skeletons/TipsSkeleton.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
 	import Tips from '$lib/components/ui/Tips.svelte';
 	import EVStats from './EVStats.svelte';
 	import ParameterForm from './ParameterForm.svelte';
+	import { batteryCapacityStore, updateBatteryCapacity } from '$lib/state/battery';
 
 	type InputConfig = {
 		id: string;
@@ -52,6 +53,14 @@
 	// Tips based on parameters
 	let chargingTips = $state<string[]>([]);
 
+	// Subscribe to the batteryCapacityStore for updates
+	batteryCapacityStore.subscribe((value) => {
+		if (isInitialized && formData.batteryKwh !== value) {
+			formData.batteryKwh = value;
+			calculateResults();
+		}
+	});
+
 	// Define input configurations
 	const inputs: InputConfig[] = [
 		{
@@ -66,6 +75,7 @@
 			getValue: () => formData.weeklyDistanceKm,
 			setValue: (val: number) => {
 				formData.weeklyDistanceKm = formatValue(val, false);
+				saveData({ weeklyDistanceKm: formData.weeklyDistanceKm });
 			}
 		},
 		{
@@ -80,6 +90,8 @@
 			getValue: () => formData.batteryKwh,
 			setValue: (val: number) => {
 				formData.batteryKwh = formatValue(val, false);
+				// Update the global battery capacity state
+				updateBatteryCapacity(formData.batteryKwh);
 			}
 		},
 		{
@@ -94,6 +106,7 @@
 			getValue: () => formData.consumptionKwhPer100km,
 			setValue: (val: number) => {
 				formData.consumptionKwhPer100km = val;
+				saveData({ consumptionKwhPer100km: formData.consumptionKwhPer100km });
 			}
 		},
 		{
@@ -108,6 +121,7 @@
 			getValue: () => formData.usableFraction * 100,
 			setValue: (val: number) => {
 				formData.usableFraction = val / 100;
+				saveData({ usableFraction: formData.usableFraction });
 			}
 		}
 	];
@@ -139,9 +153,6 @@
 			console.error('Calculation error:', err);
 			resetResults();
 		}
-
-		// Save data to localStorage
-		saveData(formData);
 	}
 
 	/**
@@ -198,24 +209,19 @@
 		} catch (err) {
 			console.error('Error loading saved data:', err);
 			error = err instanceof Error ? err.message : 'Failed to load saved data';
-			isInitialized = true;
 			isLoading = false;
 		}
 	}
 
 	/**
-	 * Formats a value based on whether decimals are allowed
+	 * Format numeric value with optional decimal places
 	 */
-	function formatValue(value: number, allowDecimals: boolean = false): number {
-		if (allowDecimals) {
-			// For decimals, round to 1 decimal place
-			return parseFloat(value.toFixed(1));
-		}
-		return Math.round(value);
+	function formatValue(value: number, allowDecimals: boolean): number {
+		return allowDecimals ? value : Math.round(value);
 	}
 
 	/**
-	 * Update tips based on input parameters and results
+	 * Updates the charging tips based on current parameters
 	 */
 	function updateTips(): void {
 		chargingTips = getFrequencyTips({
@@ -233,15 +239,20 @@
 	{#if isLoading}
 		<!-- Loading state -->
 		<Card title="EV Parameters">
-			<div class="space-y-6">
+			<div class="space-y-8">
 				{#each Array(inputs.length) as _, i}
 					<RangeInputSkeleton />
 				{/each}
 			</div>
 		</Card>
 
-		<StatsSkeleton />
-		<TipsSkeleton />
+		<div class="mt-2">
+			<StatsSkeleton columns={3} />
+		</div>
+
+		<div class="mt-2">
+			<TipsSkeleton />
+		</div>
 	{:else if error}
 		<!-- Error state -->
 		<div class="alert alert-error shadow-lg">

@@ -2,19 +2,21 @@
 	import { onMount } from 'svelte';
 	import RangeInput from '$lib/components/ui/RangeInput.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
-	import RangeInputSkeleton from '$lib/components/ui/RangeInputSkeleton.svelte';
-	import StatsSkeleton from '$lib/components/ui/StatsSkeleton.svelte';
+	import RangeInputSkeleton from '$lib/components/ui/skeletons/RangeInputSkeleton.svelte';
+	import StatsSkeleton from '$lib/components/ui/skeletons/StatsSkeleton.svelte';
 	import Stats from '$lib/components/ui/Stats.svelte';
 	import Tips from '$lib/components/ui/Tips.svelte';
-	import { saveData, getData, defaultValues } from '$lib/utils/storage';
+	import { saveData, getData } from '$lib/utils/storage';
 	import { getChargingTimeTips, getErrorTips } from '$lib/utils/tips';
+	import { batteryCapacityStore, updateBatteryCapacity } from '$lib/state/battery';
 
 	// Component state
 	let isLoading = $state(true);
+	let isInitialized = $state(false);
 
 	// Form data
 	let formData = $state({
-		batteryKwh: defaultValues.batteryKwh,
+		batteryKwh: getData().batteryKwh,
 		initialCharge: 20, // percent
 		targetCharge: 80, // percent
 		chargingPower: 11, // kW
@@ -43,6 +45,14 @@
 	// Stats data
 	let stats = $state<StatItem[]>([]);
 
+	// Subscribe to the batteryCapacityStore for updates
+	batteryCapacityStore.subscribe((value) => {
+		if (isInitialized && formData.batteryKwh !== value) {
+			formData.batteryKwh = value;
+			calculateResults();
+		}
+	});
+
 	// Define input configurations
 	const inputs = [
 		{
@@ -56,7 +66,8 @@
 			getValue: () => formData.batteryKwh,
 			setValue: (val: number) => {
 				formData.batteryKwh = Math.round(val);
-				calculateResults();
+				updateBatteryCapacity(formData.batteryKwh);
+				saveAndCalculate();
 			}
 		},
 		{
@@ -70,7 +81,8 @@
 			getValue: () => formData.initialCharge,
 			setValue: (val: number) => {
 				formData.initialCharge = Math.round(val);
-				calculateResults();
+				saveData({ initialCharge: formData.initialCharge });
+				saveAndCalculate();
 			}
 		},
 		{
@@ -84,7 +96,8 @@
 			getValue: () => formData.targetCharge,
 			setValue: (val: number) => {
 				formData.targetCharge = Math.round(val);
-				calculateResults();
+				saveData({ targetCharge: formData.targetCharge });
+				saveAndCalculate();
 			}
 		},
 		{
@@ -98,7 +111,8 @@
 			getValue: () => formData.chargingPower,
 			setValue: (val: number) => {
 				formData.chargingPower = val;
-				calculateResults();
+				saveData({ chargingPower: formData.chargingPower });
+				saveAndCalculate();
 			}
 		},
 		{
@@ -112,18 +126,29 @@
 			getValue: () => formData.chargingEfficiency,
 			setValue: (val: number) => {
 				formData.chargingEfficiency = Math.round(val);
-				calculateResults();
+				saveData({ chargingEfficiency: formData.chargingEfficiency });
+				saveAndCalculate();
 			}
 		}
 	];
 
-	// Load initial data
+	// Load initial data from localStorage and sync with global state
 	onMount(() => {
 		setTimeout(() => {
+			// Load saved data from localStorage
 			const savedData = getData();
 
-			// Only get battery capacity from saved data
-			formData.batteryKwh = savedData.batteryKwh;
+			// Update form data with saved values
+			formData = {
+				batteryKwh: savedData.batteryKwh,
+				initialCharge: savedData.initialCharge,
+				targetCharge: savedData.targetCharge,
+				chargingPower: savedData.chargingPower,
+				chargingEfficiency: savedData.chargingEfficiency
+			};
+
+			// Set initialized flag
+			isInitialized = true;
 
 			// Calculate initial results
 			calculateResults();
@@ -132,6 +157,15 @@
 			isLoading = false;
 		}, 800);
 	});
+
+	/**
+	 * Helper function to save data and calculate results
+	 */
+	function saveAndCalculate(): void {
+		if (isInitialized) {
+			calculateResults();
+		}
+	}
 
 	/**
 	 * Calculate charging time and energy needed
@@ -245,14 +279,16 @@
 	{#if isLoading}
 		<!-- Skeleton loading state -->
 		<Card title="Charging Parameters">
-			<div class="space-y-6">
+			<div class="space-y-8">
 				{#each Array(inputs.length) as _, i}
 					<RangeInputSkeleton />
 				{/each}
 			</div>
 		</Card>
 
-		<StatsSkeleton columns={2} />
+		<div class="mt-2">
+			<StatsSkeleton columns={2} />
+		</div>
 	{:else}
 		<Card title="Charging Parameters">
 			<div class="flex flex-col gap-4">
