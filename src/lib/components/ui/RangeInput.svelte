@@ -8,7 +8,6 @@
 		unit = '',
 		onChange,
 		id,
-		allowManualInput = true,
 		allowDecimals = false
 	} = $props<{
 		label: string;
@@ -46,51 +45,54 @@
 		return numValue.toString();
 	}
 
-	// Handle manual input change
+	// Just update the local input value without triggering onChange
 	function handleInputChange(e: Event) {
 		const target = e.target as HTMLInputElement;
 		inputValue = target.value;
-
-		const numValue = parseFloat(inputValue);
-		if (!isNaN(numValue)) {
-			// Clamp the value to min/max
-			const clampedValue = Math.max(min, Math.min(max, numValue));
-			onChange(clampedValue);
-		}
 	}
 
-	// Handle range slider input
+	// Handle range slider input - this should update immediately
 	function handleSliderChange(e: Event) {
 		const target = e.target as HTMLInputElement;
 		const numValue = Number(target.value);
 		onChange(numValue);
+	}
+
+	// Handle blur event to apply changes when focus is lost
+	function handleBlur() {
+		let numValue = parseFloat(inputValue);
+
+		// If the input is empty or not a number, default to minimum value
+		if (inputValue === '' || isNaN(numValue)) {
+			numValue = min;
+			inputValue = min.toString();
+		}
+
+		// Clamp the value to min/max
+		const clampedValue = Math.max(min, Math.min(max, numValue));
+		onChange(clampedValue);
 	}
 </script>
 
 <div class="mb-4">
 	<div class="mb-3 flex items-center justify-between">
 		<div class="text-base-content text-sm font-medium">{label}</div>
-		{#if allowManualInput}
-			<label
-				class="input input-sm input-bordered flex h-8 min-h-8 w-36 items-center gap-2 rounded-md px-2 shadow-sm"
-			>
-				<input
-					type="number"
-					value={formatDisplayValue(inputValue)}
-					oninput={handleInputChange}
-					{min}
-					{max}
-					{step}
-					aria-label={`Manual input for ${label}`}
-					class="grow border-none text-right text-sm focus:border-none focus:outline-none"
-				/>
-				<span class="text-base-content/70 text-xs font-medium">{unit}</span>
-			</label>
-		{:else}
-			<span class="text-base-content text-sm font-medium"
-				>{formatDisplayValue(value.toString())}{unit}</span
-			>
-		{/if}
+		<label
+			class="input input-sm input-bordered flex h-8 min-h-8 w-36 items-center gap-2 rounded-md px-2 shadow-sm"
+		>
+			<input
+				type="number"
+				value={formatDisplayValue(inputValue)}
+				oninput={handleInputChange}
+				onblur={handleBlur}
+				{min}
+				{max}
+				{step}
+				aria-label={`Manual input for ${label}`}
+				class="grow border-none text-right text-sm focus:border-none focus:outline-none"
+			/>
+			<span class="text-base-content/70 text-xs font-medium">{unit}</span>
+		</label>
 	</div>
 	<div class="pt-1">
 		<input
