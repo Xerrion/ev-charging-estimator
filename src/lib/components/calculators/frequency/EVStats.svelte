@@ -78,7 +78,7 @@
 				value: co2Savings,
 				unit: ' kg',
 				description: 'Compared to gasoline vehicles',
-				color: 'success'
+				color: 'accent'
 			}
 		];
 	});

@@ -7,7 +7,7 @@
 </script>
 
 <div class="flex min-h-screen flex-col transition-colors">
-	<header class="bg-base-100 border-base-300 border-b shadow-sm">
+	<header class="bg-base-100 border-base-300 border-b px-7 shadow-sm">
 		<div class="container-custom flex items-center justify-between py-4">
 			<h1 class="text-primary text-xl font-bold">EV Calculator Hub</h1>
 			<Navigation />

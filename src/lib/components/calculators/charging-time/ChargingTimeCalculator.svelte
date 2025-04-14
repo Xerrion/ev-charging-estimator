@@ -4,6 +4,7 @@
 	import Card from '$lib/components/ui/Card.svelte';
 	import RangeInputSkeleton from '$lib/components/ui/skeletons/RangeInputSkeleton.svelte';
 	import StatsSkeleton from '$lib/components/ui/skeletons/StatsSkeleton.svelte';
+	import TipsSkeleton from '$lib/components/ui/skeletons/TipsSkeleton.svelte';
 	import Stats from '$lib/components/ui/Stats.svelte';
 	import Tips from '$lib/components/ui/Tips.svelte';
 	import { saveData, getData } from '$lib/utils/storage';
@@ -288,6 +289,10 @@
 
 		<div class="mt-2">
 			<StatsSkeleton columns={2} />
+		</div>
+
+		<div class="mt-2">
+			<TipsSkeleton />
 		</div>
 	{:else}
 		<Card title="Charging Parameters">
