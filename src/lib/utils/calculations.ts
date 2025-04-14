@@ -30,7 +30,18 @@ export function calculateWeeklyCharges({
 	effectiveRangeKm: number;
 }): number {
 	if (effectiveRangeKm <= 0) return 0;
-	return Math.ceil(weeklyDistanceKm / effectiveRangeKm);
+
+	// Calculate the basic number of charges
+	const basicCharges = Math.ceil(weeklyDistanceKm / effectiveRangeKm);
+
+	// If range is very close to weekly distance (within 10%), add an extra charge for safety
+	const threshold = 0.1; // 10% threshold
+	const isCloseToLimit =
+		basicCharges > 0 &&
+		weeklyDistanceKm / effectiveRangeKm > 1 - threshold &&
+		weeklyDistanceKm / effectiveRangeKm < 1;
+
+	return isCloseToLimit ? basicCharges + 1 : basicCharges;
 }
 
 /**

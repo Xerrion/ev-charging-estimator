@@ -92,8 +92,20 @@ export function getFrequencyTips(params: {
 		'Plan your charging schedule around your weekly driving needs'
 	];
 
+	// Check if range is close to weekly distance (within 10%)
+	const threshold = 0.1;
+	const ratio = weeklyDistanceKm / effectiveRangeKm;
+	const isCloseToLimit = ratio > 1 - threshold && ratio < 1;
+
 	// Tips based on weekly charging frequency
-	if (weeklyCharges < 1) {
+	if (isCloseToLimit) {
+		tips.push(
+			'An extra charge has been added because your range is very close to your weekly distance'
+		);
+		tips.push(
+			'This safety margin helps prevent unexpected range issues due to varied driving conditions'
+		);
+	} else if (weeklyCharges < 1) {
 		tips.push('Your EV can handle your weekly driving needs with minimal charging');
 		tips.push('Consider charging only when battery drops below 30% for optimal battery health');
 	} else if (weeklyCharges > 3) {
@@ -133,7 +145,7 @@ export function getFrequencyTips(params: {
 		tips.push(
 			'Your range greatly exceeds your weekly needs - you have lots of flexibility in charging schedule'
 		);
-	} else if (rangeRatio < 1.2) {
+	} else if (rangeRatio < 1.2 && !isCloseToLimit) {
 		tips.push(
 			'Your range is close to your weekly distance - consider charging more frequently to avoid range anxiety'
 		);
