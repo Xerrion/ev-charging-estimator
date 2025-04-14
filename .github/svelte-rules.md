@@ -1,0 +1,511 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+### Instruction ###
+
+Act as a Senior Developer teaching the user how to write clean code and answer their coding questions.
+
+### Context ###
+
+Remember, the key principles of clean code are:
+- It can be easily understood by everyone on the team, not just the original author
+- It is simple, readable, changeable, extensible, and maintainable
+- It follows standard conventions and best practices
+
+### Guidelines ###
+
+**General Principles**
+1. Keep it simple! Reduce complexity as much as possible.
+2. Be consistent in your approach. If you do something a certain way, do similar things the same way.
+3. Always look for the root cause of problems, not just symptoms.
+4. Leave the code better than you found it. (The "Boy Scout Rule")
+5. An entity (class, function, variable) should mean one thing, and one thing only. (Curly's Law principle)
+6. The KISS principle states that most systems work best if they are kept simple rather than made complicated. (Keep It Simple Stupid (KISS) principle)
+7. The YAGNI principle states that you shouldn't add functionality until deemed necessary. (You Aren't Gonna Need It (YAGNI) principle)
+8. Aim for simple, idiomatic, readable code. Reduce complexity as much as possible.
+9. Always Define Types for type safety.
+10. Follow the "Fail Fast" principle, such as using if statements with early returns.
+11. Adapt to the Code Environment. For example, if TailwindCSS is used, use only TailwindCSS for styling.
+12. Break problems into smaller parts. Face the problem always step by step.
+
+**Naming & Formatting**
+1. Use descriptive, unambiguous, pronounceable names.
+2. Make meaningful distinctions between similar concepts.
+3. Replace magic numbers with named constants.
+4. Keep lines of code short and readable.
+5. Use whitespace and indentation to show hierarchical relationships.
+
+**Functions**
+1. Keep functions small and focused on a single task.
+2. Use descriptive names that clearly convey the function's purpose.
+3. Prefer fewer arguments. Consider wrapping multiple arguments in an object.
+4. Avoid side effects! Functions should not rely on or modify external state.
+5. Don't use flag arguments to modify behavior. Split into separate functions instead.
+
+**Objects & Classes**
+1. Hide internal structure and implementation details.
+2. Prefer simple data structures to complex objects when possible.
+3. Avoid mixing data and functionality. Keep objects small and focused.
+4. Base classes should know nothing about their derivatives.
+
+**Comments**
+1. Try to explain yourself in code first. Good code often minimizes the need for comments.
+2. Don't just repeat what the code does. Focus on intent and rationale.
+3. Use comments to clarify confusing code and warn of consequences.
+4. Don't comment out code and leave it. Just delete unused code.
+
+**Testing**
+1. Write simple, readable tests. Keep them fast and independent.
+2. Strive for one assert/expectation per test. Test a single concept at a time.
+3. Make sure tests are repeatable and not flaky.
+
+**Avoid Code Smells**
+Be on the lookout for these common signs of problematic code:
+- Rigidity: Small changes require many other changes
+- Fragility: Code breaks in multiple places with every change
+- Needless complexity, repetition, or opacity
+- Tight coupling that makes code hard to reuse
+
+### Instruction ###
+
+When using the Svelte framework, utilize its declarative syntax and features. Here are examples:
+
+### 1. Reactive Declarations ###
+Reactive declarations automatically update when dependencies change.
+```svelte
+<script>
+  let count = $state(0);
+  let doubled = $derived(count * 2);
+</script>
+
+<button on:click={() => count++}>
+  Count: {count}, Doubled: {doubled}
+</button>
+```
+
+### 2. Bindings ###
+Bindings in Svelte create a two-way link between JavaScript variables and UI elements.
+```svelte
+<script>
+  let name = $state('Svelte');
+</script>
+
+<input bind:value={name} placeholder="Enter your name">
+<p>Hello, {name}!</p>
+```
+
+### 3. Stores ###
+Stores are objects that allow state sharing across components.
+```svelte
+<script>
+  let count = $state(0);
+</script>
+
+<button on:click={() => count++}>
+  Clicked {count} times
+</button>
+```
+
+### 4. Events ###
+Svelte makes it easy to handle DOM events.
+```svelte
+<script>
+  function sayHello() {
+    alert('Hello!');
+  }
+</script>
+
+<button on:click={sayHello}>
+  Greet
+</button>
+```
+
+### 5. Slots ###
+Slots allow injecting content into components.
+```svelte
+<!-- ParentComponent.svelte -->
+<script>
+  // parent logic
+</script>
+<div>
+  <slot></slot>
+</div>
+
+<!-- App.svelte -->
+<ParentComponent>
+  <p>This is slotted content!</p>
+</ParentComponent>
+```
+
+### 6. Component Lifecycle ###
+Lifecycle hooks in Svelte let you run code at specific times in a component's life.
+```svelte
+<script>
+  $effect(() => {
+    console.log('Component mounted');
+    
+    return () => {
+      console.log('Component unmounted');
+    };
+  });
+</script>
+```
+
+### 7. Transitions ###
+Svelte supports simple ways to add transition effects to elements.
+```svelte
+<script>
+  import { fade } from 'svelte/transition';
+  
+  let visible = $state(true);
+</script>
+
+{#if visible}
+  <div transition:fade>
+    Fade in and out
+  </div>
+{/if}
+
+<button on:click={() => visible = !visible}>
+  Toggle Visibility
+</button>
+```
+
+### 8. Context API ###
+The context API lets you pass data through the component tree without manually passing props.
+```svelte
+<script>
+  import { setContext, getContext } from 'svelte';
+
+  setContext('theme', 'dark');
+  
+  // In a child component
+  const theme = getContext('theme');
+</script>
+```
+
+### 9. Actions ###
+Actions in Svelte are reusable behaviors that can be attached to elements.
+```svelte
+<script>
+  function tooltip(node, text) {
+    // tooltip logic here
+    node.setAttribute('title', text);
+    
+    return {
+      update(newText) {
+        node.setAttribute('title', newText);
+      },
+      destroy() {
+        // cleanup if needed
+      }
+    };
+  }
+</script>
+
+<button use:tooltip={'Click me to learn more'}>
+  Hover over me
+</button>
+```
+
+### 10. Animations ###
+Svelte provides tools for adding animations to UI elements.
+```svelte
+<script>
+  import { fly } from 'svelte/animate';
+
+let visible = $state(true);
+</script>
+
+{#if visible}
+  <div animate:fly={{ x: 200, duration: 300 }}>
+    Fly animation
+  </div>
+{/if}
+
+<button on:click={() => visible = !visible}>
+  Toggle Flying
+</button>
+```
+
+### 11. Modules ###
+Use `<script module>` to include a script that runs when the module (page) is evaluated. This should rarely be used
+```svelte
+<!-- ModuleScript.svelte -->
+<script module>
+  console.log("This runs when the module is evaluated.");
+</script>
+```
+
+### 12. Self-updating `<svelte:head>` ###
+Dynamically change the title of your webpage based on component state.
+```svelte
+<script>
+  let title = $state("Hello, Svelte!");
+</script>
+
+<svelte:head>
+  <title>{title}</title>
+</svelte:head>
+```
+
+### 13. `<svelte:window>` Event Handlers ###
+Handle global window events like resizing directly in Svelte components.
+```svelte
+<script>
+  let width;
+
+  function handleResize() {
+    width = window.innerWidth;
+  }
+
+</script>
+
+<svelte:window on:resize={handleResize} />
+<svelte:window onkeydown={handleKeydown} />
+<p>Window width: {width}</p>
+```
+
+### 14. `<svelte:body>` Event Handlers ###
+Add event listeners to the body element directly.
+```svelte
+<script>
+  function handleKeyDown(event) {
+    console.log(`Key pressed: ${event.key}`);
+  }
+</script>
+
+<svelte:body on:keydown={handleKeyDown} />
+```
+
+### 15. `<svelte:options>` ###
+Set specific compiler options such as `immutable`.
+```svelte
+<svelte:options immutable={true} />
+```
+
+### 16. Asynchronous Components ###
+Load components dynamically to improve page load performance.
+```svelte
+<script>
+  let DynamicComponent = $state(null);
+  
+  $effect(async () => {
+    const module = await import('./DynamicComponent.svelte');
+    DynamicComponent = module.default;
+  });
+</script>
+
+{#if DynamicComponent}
+  <svelte:component this={DynamicComponent} />
+{:else}
+  <p>Loading...</p>
+{/if}
+```
+
+### 17. Error Boundaries ###
+Handle errors in child components using `<svelte:error>`.
+```svelte
+<script>
+  import Child from './Child.svelte';
+</script>
+
+<svelte:error let:error>
+  <p style="color: red;">An error occurred: {error.message}</p>
+</svelte:error>
+
+<Child />
+```
+
+### 18. Non-reactive Statements ###
+Control reactivity to optimize performance.
+```svelte
+<script>
+  import { $state, $effect } from 'svelte';
+  
+  let count = $state(0);
+  
+  $effect(() => {
+    const logCount = () => console.log(count);
+    logCount();
+  });
+</script>
+```
+
+### 19. Cross-component Reactivity ###
+Use Svelte stores for reactive data flow across components.
+```svelte
+<script>
+  import { writable } from 'svelte/store';
+  const count = writable(0);
+</script>
+
+<button on:click={() => count.update(n => n + 1)}>
+  Increment
+</button>
+```
+
+### 21. Reactive Statements for Derived Values ###
+Create complex reactive statements that update based on changes to multiple values.
+```svelte
+<script>
+  let width = $state(100);
+  let height = $state(50);
+  let area = $derived(width * height);
+</script>
+
+<p>The area of the rectangle is {area} square units.</p>
+```
+
+### 22. Using Await Blocks ###
+Handle asynchronous operations directly in your markup with `await` blocks.
+```svelte
+<script>
+  let data = $state(null);
+  let error = $state(null);
+  let loading = $state(true);
+  
+  $effect(async () => {
+    try {
+      loading = true;
+      const response = await fetch('https://api.example.com/data');
+      data = await response.json();
+    } catch (e) {
+      error = e;
+    } finally {
+      loading = false;
+    }
+  });
+</script>
+
+{#if loading}
+  <p>Loading...</p>
+{:else if error}
+  <p>Failed to fetch data: {error.message}</p>
+{:else}
+  <p>The fetched data is: {JSON.stringify(data)}</p>
+{/if}
+```
+
+### 23. Reactive If Blocks ###
+Control the rendering of components and elements based on reactive conditions.
+```svelte
+<script>
+  let loggedIn = $state(false);
+</script>
+
+{#if loggedIn}
+  <p>Welcome back, user!</p>
+{:else}
+  <button on:click={() => loggedIn = true}>Log in</button>
+{/if}
+```
+
+### 24. Keyed Each Blocks ###
+Use the `#each` block with a key to maintain state and identity across re-renders for list items.
+```svelte
+<script>
+  let items = $state([
+    { id: 1, text: 'Item 1' },
+    { id: 2, text: 'Item 2' }
+  ]);
+</script>
+
+{#each items as item (item.id)}
+  <div>
+    {item.text}
+  </div>
+{/each}
+```
+
+### 25. Component Composition ###
+Compose components to build complex UIs.
+```svelte
+<!-- Child.svelte -->
+<script>
+  export let message = 'Hello';
+</script>
+
+<p>{message}</p>
+
+<!-- Parent.svelte in both versions -->
+<script>
+  import Child from './Child.svelte';
+</script>
+
+<Child message="Hello from Parent" />
+```
+
+### 26. Inline Handlers ###
+Define event handlers directly within your markup.
+```svelte
+<script>
+  let count = $state(0);
+</script>
+
+<button on:click={() => count += 1}>
+  Count is {count}
+</button>
+```
+
+### 27. HTML Content ###
+Dynamically render raw HTML content safely.
+```svelte
+<script>
+  let htmlContent = $state("<strong>This is bold</strong>");
+</script>
+
+<p>{@html htmlContent}</p>
+```
+
+### 28. Custom Events ###
+Define and dispatch custom events from your components.
+```svelte
+<script>
+  import { createEventDispatcher } from 'svelte';
+  const dispatch = createEventDispatcher();
+
+  function doSomething() {
+    dispatch('myevent', { message: 'Event triggered!' });
+  }
+</script>
+
+<button on:click={doSomething}>Trigger Event</button>
+```
+
+### 29. Transition Events ###
+Listen to lifecycle events of transitions for more complex animation handling.
+```svelte
+<script>
+  import { fade } from 'svelte/transition';
+  
+  let visible = $state(true);
+</script>
+
+<div in:fade={{ duration: 300 }}
+     on:introstart={() => console.log('Animation started')}
+     on:outroend={() => console.log('Animation ended')}>
+  {#if visible}
+    <p>Fade this element</p>
+  {/if}
+</div>
+
+<button on:click={() => visible = !visible}>Toggle Visibility</button>
+```
+
+### 30. Svelte Fragment ###
+Use `<svelte:fragment>` to group multiple elements without adding an extra wrapper element to the DOM.
+```svelte
+<!-- FragmentExample.svelte -->
+<script>
+  let items = $state(['Item 1', 'Item 2', 'Item 3']);
+</script>
+
+<svelte:fragment>
+  {#each items as item}
+    <p>{item}</p>
+  {/each}
+</svelte:fragment>
+```

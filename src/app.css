@@ -1,0 +1,115 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* Catppuccin Latte (Light) Theme */
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  /* Latte Colors */
+  --color-base-100: #eff1f5; /* Base */
+  --color-base-200: #e6e9ef; /* Mantle */
+  --color-base-300: #dce0e8; /* Crust */
+  --color-base-content: #4c4f69; /* Text */
+  
+  --color-primary: #1e66f5; /* Blue */
+  --color-primary-content: #eff1f5; /* Base */
+  
+  --color-secondary: #8839ef; /* Mauve */
+  --color-secondary-content: #eff1f5; /* Base */
+  
+  --color-accent: #dd7878; /* Maroon */
+  --color-accent-content: #eff1f5; /* Base */
+  
+  --color-neutral: #7c7f93; /* Overlay 0 */
+  --color-neutral-content: #eff1f5; /* Base */
+  
+  --color-info: #209fb5; /* Sapphire */
+  --color-info-content: #eff1f5; /* Base */
+  
+  --color-success: #40a02b; /* Green */
+  --color-success-content: #eff1f5; /* Base */
+  
+  --color-warning: #df8e1d; /* Yellow */
+  --color-warning-content: #4c4f69; /* Text */
+  
+  --color-error: #d20f39; /* Red */
+  --color-error-content: #eff1f5; /* Base */
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  --border: 1px;
+
+  --depth: 1;
+  --noise: 0;
+}
+
+/* Catppuccin Mocha (Dark) Theme */
+@plugin "daisyui/theme" {
+  name: "dark";
+  prefersdark: true;
+  color-scheme: dark;
+
+  /* Mocha Colors */
+  --color-base-100: #1e1e2e; /* Base */
+  --color-base-200: #181825; /* Mantle */
+  --color-base-300: #11111b; /* Crust */
+  --color-base-content: #cdd6f4; /* Text */
+  
+  --color-primary: #89b4fa; /* Blue */
+  --color-primary-content: #1e1e2e; /* Base */
+  
+  --color-secondary: #cba6f7; /* Mauve */
+  --color-secondary-content: #1e1e2e; /* Base */
+  
+  --color-accent: #f5c2e7; /* Pink */
+  --color-accent-content: #1e1e2e; /* Base */
+  
+  --color-neutral: #9399b2; /* Overlay 0 */
+  --color-neutral-content: #1e1e2e; /* Base */
+  
+  --color-info: #74c7ec; /* Sapphire */
+  --color-info-content: #1e1e2e; /* Base */
+  
+  --color-success: #a6e3a1; /* Green */
+  --color-success-content: #1e1e2e; /* Base */
+  
+  --color-warning: #f9e2af; /* Yellow */
+  --color-warning-content: #1e1e2e; /* Base */
+  
+  --color-error: #f38ba8; /* Red */
+  --color-error-content: #1e1e2e; /* Base */
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  --border: 1px;
+
+  --depth: 1;
+  --noise: 0;
+}
+
+/* Custom base styles */
+@layer base {
+  body {
+    @apply transition-colors;
+  }
+}
+
+/* Custom utility classes */
+@layer utilities {
+  .container-custom {
+    @apply max-w-4xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
