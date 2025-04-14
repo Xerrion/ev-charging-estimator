@@ -17,16 +17,17 @@
 	];
 </script>
 
-<div class="w-full overflow-x-auto">
+<nav class="w-full overflow-x-auto">
 	<div class="tabs tabs-boxed w-full">
 		{#each navItems as item}
+			{@const isActive = $page.url.pathname === item.path}
 			<a
 				href={item.path}
-				class="tab tab-lg {$page.url.pathname === item.path ? 'tab-active' : ''}"
-				aria-current={$page.url.pathname === item.path ? 'page' : undefined}
+				class="tab tab-lg {isActive ? 'tab-active' : ''}"
+				aria-current={isActive ? 'page' : undefined}
 			>
 				{item.label}
 			</a>
 		{/each}
 	</div>
-</div>
+</nav>

@@ -2,13 +2,14 @@
 	import { weeklyEvChargeEstimator } from '$lib/utils/calculations';
 	import { saveData, getData, defaultValues } from '$lib/utils/storage';
 	import { INPUT_RANGES } from '$lib/utils/constants';
+	import { getFrequencyTips, getErrorTips } from '$lib/utils/tips';
 	import { onMount } from 'svelte';
 	import RangeInputSkeleton from '$lib/components/ui/RangeInputSkeleton.svelte';
 	import StatsSkeleton from '$lib/components/ui/StatsSkeleton.svelte';
 	import TipsSkeleton from '$lib/components/ui/TipsSkeleton.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
+	import Tips from '$lib/components/ui/Tips.svelte';
 	import EVStats from './EVStats.svelte';
-	import ChargingTips from './ChargingTips.svelte';
 	import ParameterForm from './ParameterForm.svelte';
 
 	type InputConfig = {
@@ -47,6 +48,9 @@
 		effectiveRangeKm: 0,
 		weeklyCharges: 0
 	});
+
+	// Tips based on parameters
+	let chargingTips = $state<string[]>([]);
 
 	// Define input configurations
 	const inputs: InputConfig[] = [
@@ -127,6 +131,7 @@
 			// Only calculate if all required values are valid numbers greater than 0
 			if (isFormDataValid()) {
 				results = weeklyEvChargeEstimator(formData);
+				updateTips();
 			} else {
 				resetResults();
 			}
@@ -159,6 +164,9 @@
 			effectiveRangeKm: 0,
 			weeklyCharges: 0
 		};
+
+		// Default tips on error
+		chargingTips = getErrorTips();
 	}
 
 	/**
@@ -205,6 +213,20 @@
 		}
 		return Math.round(value);
 	}
+
+	/**
+	 * Update tips based on input parameters and results
+	 */
+	function updateTips(): void {
+		chargingTips = getFrequencyTips({
+			weeklyDistanceKm: formData.weeklyDistanceKm,
+			batteryKwh: formData.batteryKwh,
+			consumptionKwhPer100km: formData.consumptionKwhPer100km,
+			usableFraction: formData.usableFraction,
+			effectiveRangeKm: results.effectiveRangeKm,
+			weeklyCharges: results.weeklyCharges
+		});
+	}
 </script>
 
 <div class="flex w-full flex-col gap-6">
@@ -244,6 +266,7 @@
 		<ParameterForm {inputs} />
 
 		<EVStats {results} {formData} />
-		<ChargingTips />
+
+		<Tips title="Charging Frequency Tips" tips={chargingTips} color="success" />
 	{/if}
 </div>

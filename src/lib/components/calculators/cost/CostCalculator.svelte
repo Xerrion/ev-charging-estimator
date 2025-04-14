@@ -1,5 +1,10 @@
 <script lang="ts">
 	import ResultCard from '$lib/components/ui/ResultCard.svelte';
+	import Tips from '$lib/components/ui/Tips.svelte';
+	import { getCostTips } from '$lib/utils/tips';
+
+	// Get cost tips from the utility
+	const costTips = getCostTips();
 </script>
 
 <div class="w-full">
@@ -26,5 +31,9 @@
 			description="Estimate your yearly expenses for EV charging"
 			color="info"
 		/>
+	</div>
+
+	<div class="mt-6">
+		<Tips title="Cost Saving Tips" tips={costTips} color="accent" />
 	</div>
 </div>

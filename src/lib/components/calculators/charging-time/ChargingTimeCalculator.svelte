@@ -5,7 +5,9 @@
 	import RangeInputSkeleton from '$lib/components/ui/RangeInputSkeleton.svelte';
 	import StatsSkeleton from '$lib/components/ui/StatsSkeleton.svelte';
 	import Stats from '$lib/components/ui/Stats.svelte';
+	import Tips from '$lib/components/ui/Tips.svelte';
 	import { saveData, getData, defaultValues } from '$lib/utils/storage';
+	import { getChargingTimeTips, getErrorTips } from '$lib/utils/tips';
 
 	// Component state
 	let isLoading = $state(true);
@@ -25,6 +27,9 @@
 		chargingTimeMinutes: 0,
 		energyNeeded: 0
 	});
+
+	// Tips based on parameters
+	let chargingTips = $state<string[]>([]);
 
 	// Define stat item type
 	type StatItem = {
@@ -156,6 +161,9 @@
 
 			// Update stats
 			updateStats();
+
+			// Update tips based on parameters
+			updateTips();
 		} catch (err) {
 			console.error('Calculation error:', err);
 
@@ -168,6 +176,9 @@
 
 			// Update stats
 			updateStats();
+
+			// Default tips on error
+			chargingTips = getErrorTips();
 		}
 	}
 
@@ -213,6 +224,21 @@
 			}
 		];
 	}
+
+	/**
+	 * Update tips based on input parameters
+	 */
+	function updateTips(): void {
+		chargingTips = getChargingTimeTips({
+			batteryKwh: formData.batteryKwh,
+			initialCharge: formData.initialCharge,
+			targetCharge: formData.targetCharge,
+			chargingPower: formData.chargingPower,
+			chargingEfficiency: formData.chargingEfficiency,
+			chargingTimeHours: results.chargingTimeHours,
+			chargingTimeMinutes: results.chargingTimeMinutes
+		});
+	}
 </script>
 
 <div class="flex w-full flex-col gap-6">
@@ -248,5 +274,7 @@
 		</Card>
 
 		<Stats {stats} />
+
+		<Tips title="Charging Recommendations" tips={chargingTips} color="info" />
 	{/if}
 </div>

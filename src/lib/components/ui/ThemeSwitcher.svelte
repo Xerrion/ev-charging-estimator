@@ -5,6 +5,7 @@
 	let theme = $state<'light' | 'dark'>(getData().theme);
 	let isInitialized = $state(false);
 
+	// Apply theme changes and save to storage
 	$effect(() => {
 		// Skip the initial theme application since we handle it in onMount
 		if (!isInitialized) return;
@@ -18,6 +19,7 @@
 		}
 	});
 
+	// Initialize theme on component mount
 	onMount(() => {
 		// Get the theme from storage
 		const savedData = getData();
@@ -30,6 +32,7 @@
 		isInitialized = true;
 	});
 
+	// Toggle between light and dark theme
 	function toggleTheme() {
 		theme = theme === 'light' ? 'dark' : 'light';
 	}

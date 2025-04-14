@@ -1,38 +1,48 @@
-# sv
+# EV Charge Frequency Estimator
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+An interactive web application for electric vehicle owners to calculate and plan their charging needs.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Charge Frequency Calculator**: Calculate how often you need to charge your EV based on your weekly driving distance and vehicle specifications.
+- **Charging Time Calculator**: Estimate how long it takes to charge your vehicle under different conditions.
+- **Cost Calculator** (Coming Soon): Calculate the cost of charging your EV at home or at public stations.
 
-```bash
-# create a new project in the current directory
-npx sv create
+## Technologies
 
-# create a new project in my-app
-npx sv create my-app
-```
+- Built with SvelteKit and Svelte 5 Runes
+- Styled with TailwindCSS and DaisyUI
+- Fully responsive design for all devices
+- Dark/light theme support
 
-## Developing
+## Development
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+This project uses Bun as the package manager and runtime.
 
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
+### Setup
 
 ```bash
-npm run build
+# Install dependencies
+bun install
+
+# Start development server
+bun run dev
+
+# Build for production
+bun run build
 ```
 
-You can preview the production build with `npm run preview`.
+### Structure
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+- `/src/lib/components/calculators/` - Calculator components
+- `/src/lib/components/ui/` - Reusable UI components
+- `/src/lib/utils/` - Utility functions and calculations
+- `/src/routes/` - SvelteKit routes and pages
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Commit your changes: `git commit -m 'Add my feature'`
+4. Push to the branch: `git push origin feature/my-feature`
+5. Submit a pull request
