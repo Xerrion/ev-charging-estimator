@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
-	import { navigating } from '$app/stores';
+	import { page, navigating } from '$app/state';
 
 	// Analytics configuration
 	const ANALYTICS_CONFIG = {
@@ -14,14 +13,18 @@
 	// Flag to track if analytics is loaded
 	let analyticsLoaded = $state(false);
 
+	// Page state values
+	const getPath = () => page.url.pathname;
+	const isNavigationComplete = () => !navigating.complete;
+
 	// Track page views when route changes
 	$effect(() => {
 		if (analyticsLoaded && ANALYTICS_CONFIG.enabled) {
-			const path = $page.url.pathname;
+			const path = getPath();
 			const title = document.title;
 
 			// Only track when navigation is complete
-			if (!$navigating) {
+			if (isNavigationComplete()) {
 				// Track page view in analytics
 				trackPageView(path, title);
 			}
@@ -35,7 +38,7 @@
 			loadAnalytics().then(() => {
 				analyticsLoaded = true;
 				// Track initial page view
-				trackPageView($page.url.pathname, document.title);
+				trackPageView(getPath(), document.title);
 			});
 		}
 

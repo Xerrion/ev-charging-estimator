@@ -2,7 +2,7 @@
 	import '../app.css';
 	import ThemeSwitcher from '$lib/components/ui/ThemeSwitcher.svelte';
 	import Navigation from '$lib/components/layout/Navigation.svelte';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import Analytics from '$lib/components/util/Analytics.svelte';
 
 	let { children } = $props();
@@ -19,7 +19,7 @@
 
 	// Page-specific SEO data based on route
 	$effect(() => {
-		const path = $page.url.pathname;
+		const path = page.url.pathname;
 
 		// Update page title based on the current route
 		if (path === '/') {
@@ -47,7 +47,7 @@
 
 	<!-- Open Graph / Facebook -->
 	<meta property="og:type" content={seoData.type} />
-	<meta property="og:url" content={$page.url.href} />
+	<meta property="og:url" content={page.url.href} />
 	<meta property="og:title" content={seoData.title} />
 	<meta property="og:description" content={seoData.description} />
 	<meta property="og:image" content={seoData.image} />
@@ -59,7 +59,7 @@
 	<meta name="twitter:image" content={seoData.image} />
 
 	<!-- Canonical URL -->
-	<link rel="canonical" href={$page.url.href} />
+	<link rel="canonical" href={page.url.href} />
 </svelte:head>
 
 <!-- Include Analytics component (doesn't render anything visible) -->

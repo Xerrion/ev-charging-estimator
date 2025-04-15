@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	const navItems = [
 		{
@@ -21,7 +21,7 @@
 	<div class="flex flex-col gap-1">
 		<div class="tabs tabs-boxed w-full">
 			{#each navItems as item}
-				{@const isActive = $page.url.pathname === item.path}
+				{@const isActive = page.url.pathname === item.path}
 				<a
 					href={item.path}
 					class="tab tab-lg {isActive ? 'tab-active' : ''}"
