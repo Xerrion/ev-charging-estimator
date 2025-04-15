@@ -31,15 +31,20 @@ export function calculateWeeklyCharges({
 }): number {
   if (effectiveRangeKm <= 0) return 0;
 
-  // Calculate the basic number of charges
-  const basicCharges = Math.ceil(weeklyDistanceKm / effectiveRangeKm);
+  // Calculate the raw ratio of distance to range
+  const ratio = weeklyDistanceKm / effectiveRangeKm;
 
-  // If range is very close to weekly distance (within 10%), add an extra charge for safety
-  const threshold = 0.1; // 10% threshold
-  const isCloseToLimit =
-    basicCharges > 0 && weeklyDistanceKm / effectiveRangeKm > 1 - threshold && weeklyDistanceKm / effectiveRangeKm < 1;
+  // Calculate the basic number of charges without rounding
+  const basicChargesRaw = ratio;
 
-  return isCloseToLimit ? basicCharges + 1 : basicCharges;
+  // Calculate the rounded basic charges
+  const basicCharges = Math.ceil(basicChargesRaw);
+
+  // Only add safety charge if we're just below a whole number (prevents erratic jumps)
+  // If the fractional part is greater than 0.9, we're very close to the next integer
+  const isCloseToLimit = ratio % 1 > 0.9;
+
+  return isCloseToLimit ? Math.floor(ratio) + 1 : basicCharges;
 }
 
 /**
@@ -319,15 +324,18 @@ export function formatTime(hours: number, minutes: number): string {
  */
 export function isSafetyChargeAdded({
   weeklyDistanceKm,
-  effectiveRangeKm,
-  threshold = 0.1
+  effectiveRangeKm
 }: {
   weeklyDistanceKm: number;
   effectiveRangeKm: number;
-  threshold?: number;
 }): boolean {
+  if (effectiveRangeKm <= 0) return false;
+
+  // Calculate the ratio of distance to range
   const ratio = weeklyDistanceKm / effectiveRangeKm;
-  return ratio > 1 - threshold && ratio < 1;
+
+  // Check if we're very close to the next whole number (>90% of the way)
+  return ratio % 1 > 0.9;
 }
 
 /**

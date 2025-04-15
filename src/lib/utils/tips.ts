@@ -136,10 +136,9 @@ export function getFrequencyTips(params: {
     'Plan your charging schedule around your weekly driving needs'
   ];
 
-  // Check if range is close to weekly distance (within 10%)
-  const threshold = 0.1;
+  // Check if we're very close to the next whole number (>90% of the way)
   const ratio = weeklyDistanceKm / effectiveRangeKm;
-  const isCloseToLimit = ratio > 1 - threshold && ratio < 1;
+  const isCloseToLimit = ratio % 1 > 0.9;
 
   // Tips based on weekly charging frequency
   if (isCloseToLimit) {
