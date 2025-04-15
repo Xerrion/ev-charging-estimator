@@ -19,6 +19,7 @@ export type StorageData = {
   offPeakElectricityRate: number;
   chargingDuringOffPeak: number;
   selectedCurrency: string;
+  chargingType: 'AC' | 'DC';
 };
 
 /**
@@ -153,7 +154,13 @@ function validateStoredData(data: unknown): StorageData {
     // Type-safe way to iterate through the numeric fields
     for (const field of numericFields) {
       if (typeof typedData[field] === 'number' && !isNaN(typedData[field] as number)) {
-        result[field] = typedData[field] as number;
+        // Special handling for usableFraction to ensure it's always between 0 and 1
+        if (field === 'usableFraction') {
+          const value = typedData[field] as number;
+          result[field] = value > 1 ? value / 100 : value;
+        } else {
+          result[field] = typedData[field] as number;
+        }
       }
     }
 
@@ -165,6 +172,11 @@ function validateStoredData(data: unknown): StorageData {
     // Handle selected currency
     if (typeof typedData.selectedCurrency === 'string') {
       result.selectedCurrency = typedData.selectedCurrency;
+    }
+
+    // Handle charging type
+    if (typedData.chargingType === 'AC' || typedData.chargingType === 'DC') {
+      result.chargingType = typedData.chargingType;
     }
   }
 

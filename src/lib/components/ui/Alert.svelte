@@ -65,13 +65,15 @@
 </script>
 
 {#if visible}
-  <div role="alert" class="alert alert-{type} {styleClass()} {className}" transition:fade={{ duration: 200 }}>
-    {@html icon}
-    <span>{message}</span>
-    {#if dismissible}
-      <button class="btn btn-ghost btn-sm" onclick={dismiss}>
-        <img src={xIcon} alt="Close" class="h-5 w-5" />
-      </button>
-    {/if}
+  <div transition:fade|global={{ duration: 200 }}>
+    <div role="alert" class="alert alert-{type} {styleClass()} {className}">
+      {@html icon}
+      <span>{message}</span>
+      {#if dismissible}
+        <button class="btn btn-ghost btn-sm" onclick={dismiss}>
+          <img src={xIcon} alt="Close" class="h-5 w-5" />
+        </button>
+      {/if}
+    </div>
   </div>
 {/if}

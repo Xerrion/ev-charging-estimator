@@ -91,5 +91,6 @@ export const DEFAULT_VALUES = {
   peakElectricityRate: 0.25, // Default peak electricity rate per kWh
   offPeakElectricityRate: 0.1, // Default off-peak electricity rate per kWh
   chargingDuringOffPeak: 70, // Default percentage of charging during off-peak hours
-  selectedCurrency: 'USD' // Default currency
+  selectedCurrency: 'USD', // Default currency
+  chargingType: 'AC' as 'AC' | 'DC' // Default to AC charging
 };

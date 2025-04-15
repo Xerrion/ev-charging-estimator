@@ -8,6 +8,17 @@
   // Define input fields configuration
   const inputFields = [
     {
+      id: 'charging-type',
+      label: 'Charging Type',
+      key: 'chargingType',
+      storeKey: 'chargingType',
+      options: [
+        { value: 'AC', label: 'AC Charging (Home/Destination)' },
+        { value: 'DC', label: 'DC Fast Charging' }
+      ],
+      type: 'radio' as const
+    },
+    {
       id: 'battery-capacity',
       label: 'Battery Capacity',
       key: 'batteryKwh',
@@ -40,6 +51,7 @@
       unit: '%',
       allowDecimals: false
     },
+
     {
       id: 'charging-power',
       label: 'Charging Power',
@@ -87,18 +99,27 @@
   ];
 
   // Calculate function
-  function calculateResults(formData: Record<string, number>) {
-    const { batteryKwh, initialCharge, targetCharge, chargingPower, chargingEfficiency, temperatureC, phases } =
-      formData;
-
-    return calculateChargingTime({
+  function calculateResults(formData: Record<string, number | string>) {
+    const {
       batteryKwh,
       initialCharge,
       targetCharge,
       chargingPower,
       chargingEfficiency,
       temperatureC,
-      phases
+      phases,
+      chargingType = 'AC'
+    } = formData;
+
+    return calculateChargingTime({
+      batteryKwh: Number(batteryKwh),
+      initialCharge: Number(initialCharge),
+      targetCharge: Number(targetCharge),
+      chargingPower: Number(chargingPower),
+      chargingEfficiency: Number(chargingEfficiency),
+      temperatureC: Number(temperatureC),
+      phases: Number(phases),
+      chargingType: chargingType as 'AC' | 'DC'
     });
   }
 

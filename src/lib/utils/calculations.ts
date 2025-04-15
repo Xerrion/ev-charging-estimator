@@ -2,6 +2,11 @@
  * Utility functions for EV charging calculations
  */
 
+// Constants
+const MAX_POWER_PER_PHASE = 7.4; // Maximum power per phase for typical home installations (kW)
+const MAX_AC_POWER = 22.2; // Maximum power for AC charging (3 phases * 7.4 kW)
+const MAX_DC_POWER = 350; // Maximum power for DC fast charging (kW)
+
 /**
  * Calculates the effective range of an EV in kilometers
  */
@@ -140,7 +145,8 @@ export function calculateChargingTime({
   chargingPower,
   chargingEfficiency,
   temperatureC = 20, // Default to room temperature (20°C)
-  phases = 3 // Default to 3-phase charging
+  phases = 3, // Default to 3-phase charging
+  chargingType = 'AC' // Default to AC charging
 }: {
   batteryKwh: number;
   initialCharge: number; // percentage
@@ -149,30 +155,47 @@ export function calculateChargingTime({
   chargingEfficiency: number; // percentage
   temperatureC?: number; // Temperature in Celsius
   phases?: number; // Number of charging phases (1, 2, or 3)
+  chargingType?: 'AC' | 'DC'; // Type of charging
 }): {
   chargingTimeHours: number;
   chargingTimeMinutes: number;
   energyNeeded: number;
   technicalLimitExceeded?: boolean;
   actualChargingPower: number;
-  limitingFactor?: 'c-rate' | 'phases' | 'temperature' | null;
+  limitingFactor?: 'c-rate' | 'phases' | 'temperature' | 'connector' | null;
 } {
-  // Apply phase-based power limitations
-  const phaseBasedPower = applyPhaseLimitation(chargingPower, phases);
+  // Apply appropriate power limitations based on charging type
+  let powerLimit: number;
+  let limitingFactor: 'c-rate' | 'phases' | 'temperature' | 'connector' | null = null;
 
-  // Check if charging power exceeds technical limits
+  if (chargingType === 'AC') {
+    // For AC, apply phase-based limitations
+    powerLimit = applyPhaseLimitation(chargingPower, phases);
+
+    // Determine if phases are limiting the power
+    if (powerLimit < chargingPower) {
+      // Only set the limitingFactor to 'phases' if phases are not already at maximum (3)
+      // or if requested power is higher than what even max phases can provide
+      if (phases < 3 || chargingPower > 3 * MAX_POWER_PER_PHASE) {
+        limitingFactor = 'phases';
+      }
+    }
+  } else {
+    // For DC, use a higher limit
+    if (chargingPower > MAX_DC_POWER) {
+      powerLimit = MAX_DC_POWER;
+      limitingFactor = 'connector';
+    } else {
+      powerLimit = chargingPower;
+    }
+  }
+
+  // Check if charging power exceeds technical limits based on battery capacity
   const technicalLimit = getMaxChargingPower(batteryKwh);
-  const technicalLimitExceeded = phaseBasedPower > technicalLimit;
+  const technicalLimitExceeded = powerLimit > technicalLimit;
 
   // Get the actual charging power after applying all limitations
-  let actualChargingPower = phaseBasedPower;
-  let limitingFactor: 'c-rate' | 'phases' | 'temperature' | null = null;
-
-  // Determine which factor is limiting the charging power
-  if (phaseBasedPower < chargingPower) {
-    limitingFactor = 'phases';
-    actualChargingPower = phaseBasedPower;
-  }
+  let actualChargingPower = powerLimit;
 
   if (technicalLimitExceeded) {
     limitingFactor = 'c-rate';
@@ -184,6 +207,11 @@ export function calculateChargingTime({
   if (temperatureMultiplier < 1.0) {
     limitingFactor = 'temperature';
     actualChargingPower = actualChargingPower * temperatureMultiplier;
+  }
+
+  // Ensure there's always at least some minimal charging power
+  if (actualChargingPower < 0.1) {
+    actualChargingPower = 0.1; // Prevent charging power from becoming too low
   }
 
   // Calculate energy needed
@@ -269,11 +297,8 @@ function segmentCharging(
  * Most home chargers are limited by the number of phases available
  */
 function applyPhaseLimitation(requestedPower: number, phases: number): number {
-  // Maximum power per phase for typical home installations (7.4 kW)
-  const maxPerPhase = 7.4;
-
   // Maximum power based on phases
-  const phaseLimit = phases * maxPerPhase;
+  const phaseLimit = phases * MAX_POWER_PER_PHASE;
 
   return Math.min(requestedPower, phaseLimit);
 }

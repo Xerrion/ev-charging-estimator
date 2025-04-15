@@ -19,6 +19,17 @@
   // Define base input fields (common for both rate types)
   const baseInputFields = [
     {
+      id: 'weekly-distance',
+      label: 'Weekly Distance',
+      key: 'weeklyDistanceKm',
+      storeKey: 'weeklyDistanceKm',
+      min: INPUT_RANGES.WEEKLY_DISTANCE.MIN,
+      max: INPUT_RANGES.WEEKLY_DISTANCE.MAX,
+      step: INPUT_RANGES.WEEKLY_DISTANCE.STEP,
+      unit: 'km',
+      allowDecimals: false
+    },
+    {
       id: 'battery-capacity',
       label: 'Battery Capacity',
       key: 'batteryKwh',
@@ -62,17 +73,7 @@
       unit: '%',
       allowDecimals: false
     },
-    {
-      id: 'weekly-distance',
-      label: 'Weekly Distance',
-      key: 'weeklyDistanceKm',
-      storeKey: 'weeklyDistanceKm',
-      min: INPUT_RANGES.WEEKLY_DISTANCE.MIN,
-      max: INPUT_RANGES.WEEKLY_DISTANCE.MAX,
-      step: INPUT_RANGES.WEEKLY_DISTANCE.STEP,
-      unit: 'km',
-      allowDecimals: false
-    },
+
     {
       id: 'energy-consumption',
       label: 'Energy Consumption',
@@ -234,7 +235,7 @@
 </script>
 
 <BaseCalculator
-  title="Cost Parameters"
+  title="Charging Parameters"
   inputFields={currentFields}
   calculateFn={calculateResults}
   statsComponent={CostStats}

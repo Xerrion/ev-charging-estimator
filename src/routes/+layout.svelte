@@ -85,17 +85,7 @@
 <div class="flex min-h-screen flex-col transition-colors">
   <header class="bg-base-100 border-base-300 border-b shadow-sm">
     <div class="container-custom">
-      <div class="navbar">
-        <div class="navbar-start">
-          <a href="/" class="btn btn-ghost text-primary text-xl font-bold">EV Estimator Hub</a>
-        </div>
-
-        <Navigation />
-
-        <div class="navbar-end">
-          <ThemeSwitcher currentTheme={data.theme as 'light' | 'dark'} />
-        </div>
-      </div>
+      <Navigation currentTheme={data.theme as 'light' | 'dark'} />
     </div>
   </header>
 

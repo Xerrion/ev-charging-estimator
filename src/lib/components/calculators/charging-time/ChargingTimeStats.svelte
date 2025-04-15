@@ -10,7 +10,7 @@
     energyNeeded: number;
     technicalLimitExceeded?: boolean;
     actualChargingPower?: number;
-    limitingFactor?: 'c-rate' | 'phases' | 'temperature' | null;
+    limitingFactor?: 'c-rate' | 'phases' | 'temperature' | 'connector' | null;
   };
 
   type StatItem = {
@@ -33,6 +33,7 @@
       targetCharge: number;
       chargingPower: number;
       chargingEfficiency: number;
+      phases: number;
     };
     title?: string;
   }>();
@@ -66,7 +67,7 @@
 
   // Helper function to generate a description based on the limiting factor
   function getLimitingFactorDescription(
-    factor?: 'c-rate' | 'phases' | 'temperature' | null,
+    factor?: 'c-rate' | 'phases' | 'temperature' | 'connector' | null,
     requestedPower?: number
   ): string {
     if (!factor || factor === null) return 'Maximum available power';
@@ -78,6 +79,8 @@
         return 'Limited by charging phases';
       case 'temperature':
         return 'Limited by battery temperature';
+      case 'connector':
+        return 'Limited by charging connector';
       default:
         return 'Limited by unknown factor';
     }
@@ -102,8 +105,14 @@
   {#if results.limitingFactor === 'phases'}
     <Alert
       type="info"
-      message="Charging is limited by the available phases. Multi-phase charging enables faster charging."
+      message={formData.phases >= 3
+        ? 'Your charging power exceeds what a typical home installation can deliver even with maximum phases.'
+        : 'Charging is limited by the available phases. Multi-phase charging enables faster charging.'}
     />
+  {/if}
+
+  {#if results.limitingFactor === 'connector'}
+    <Alert type="info" message="Charging is limited by the DC connector's maximum power rating." />
   {/if}
 
   <Stats {stats} />

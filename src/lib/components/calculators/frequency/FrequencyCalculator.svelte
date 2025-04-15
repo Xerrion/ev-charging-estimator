@@ -58,7 +58,8 @@
     const { weeklyDistanceKm, batteryKwh, consumptionKwhPer100km, usableFraction } = formData;
 
     // Convert usableFraction from percent to decimal
-    const fraction = usableFraction / 100;
+    // Ensure we're working with a proper decimal (0-1 range)
+    const fraction = usableFraction > 1 ? usableFraction / 100 : usableFraction;
 
     return weeklyEvChargeEstimator({
       weeklyDistanceKm,
@@ -70,11 +71,14 @@
 
   // Tips function
   function getTips(data: Record<string, any>) {
+    // Ensure usableFraction is properly converted to decimal (0-1 range)
+    const usableFraction = data.usableFraction > 1 ? data.usableFraction / 100 : data.usableFraction;
+
     return getFrequencyTips({
       weeklyDistanceKm: data.weeklyDistanceKm,
       batteryKwh: data.batteryKwh,
       consumptionKwhPer100km: data.consumptionKwhPer100km,
-      usableFraction: data.usableFraction / 100,
+      usableFraction,
       effectiveRangeKm: data.effectiveRangeKm,
       weeklyCharges: data.weeklyCharges
     });
@@ -82,7 +86,7 @@
 </script>
 
 <BaseCalculator
-  title="EV Parameters"
+  title="Charging Parameters"
   {inputFields}
   calculateFn={calculateResults}
   statsComponent={FrequencyStats}

@@ -18,7 +18,7 @@ export function getChargingTimeTips(params: {
   chargingTimeHours: number;
   chargingTimeMinutes: number;
   actualChargingPower?: number;
-  limitingFactor?: 'c-rate' | 'phases' | 'temperature' | null;
+  limitingFactor?: 'c-rate' | 'phases' | 'temperature' | 'connector' | null;
 }): string[] {
   const {
     batteryKwh,
@@ -56,6 +56,8 @@ export function getChargingTimeTips(params: {
       tips.push('High temperatures can affect charging speed and battery health');
       tips.push('Try to charge in shade or during cooler parts of the day when possible');
     }
+  } else if (limitingFactor === 'connector') {
+    tips.push('DC fast chargers typically range from 50 kW to 350 kW, with most public chargers offering 50-150 kW');
   }
 
   // Tips based on charging power
