@@ -2,6 +2,7 @@
   import { generateFrequencyStats, isSafetyChargeAdded } from '$lib/utils/calculations';
   import Stats from '$lib/components/ui/Stats.svelte';
   import Card from '$lib/components/ui/Card.svelte';
+  import Alert from '$lib/components/ui/Alert.svelte';
 
   type Result = {
     effectiveRangeKm: number;
@@ -53,5 +54,12 @@
 </script>
 
 <Card {title}>
+  {#if safetyChargeAdded}
+    <Alert
+      type="warning"
+      message="An extra safety charge has been added because your driving distance is very close to your vehicle's range"
+      className="mb-4"
+    />
+  {/if}
   <Stats {stats} />
 </Card>

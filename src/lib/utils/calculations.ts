@@ -355,7 +355,7 @@ export function getWeeklyChargesDescription({
   charges: number;
   safetyChargeAdded: boolean;
 }): string {
-  if (safetyChargeAdded) return 'Extra charge added for safety margin';
+  if (safetyChargeAdded) return '✓ Safety margin included';
   if (charges <= 1) return 'Less than once per week';
   if (charges > 3) return 'Frequent charging needed';
   return 'Normal charging frequency';
@@ -432,7 +432,7 @@ export function generateFrequencyStats({
       color: 'primary'
     },
     {
-      title: 'Weekly Charges',
+      title: safetyChargeAdded ? 'Weekly Charges (Safe)' : 'Weekly Charges',
       value: weeklyCharges,
       description: getWeeklyChargesDescription({
         charges: weeklyCharges,
