@@ -176,7 +176,7 @@ export function calculateChargingTime({
     if (powerLimit < chargingPower) {
       // Only set the limitingFactor to 'phases' if phases are not already at maximum (3)
       // or if requested power is higher than what even max phases can provide
-      if (phases < 3 || chargingPower > 3 * MAX_POWER_PER_PHASE) {
+      if (phases < 3 || chargingPower > MAX_AC_POWER) {
         limitingFactor = 'phases';
       }
     }
