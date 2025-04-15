@@ -1,14 +1,14 @@
 <script>
-	import CalculatorLayout from '$lib/components/layout/CalculatorLayout.svelte';
-	import ChargingTimeCalculator from '$lib/components/calculators/charging-time/ChargingTimeCalculator.svelte';
+  import CalculatorLayout from '$lib/components/layout/CalculatorLayout.svelte';
+  import ChargingTimeCalculator from '$lib/components/calculators/charging-time/ChargingTimeCalculator.svelte';
 </script>
 
 <CalculatorLayout
-	title="Charging Time Calculator"
-	description="Calculate how long it will take to charge your electric vehicle from the initial charge level to your target level."
-	calculator={() => ChargingTimeCalculator}
-	explanation={() => {
-		return `
+  title="Charging Time Calculator"
+  description="Calculate how long it will take to charge your electric vehicle from the initial charge level to your target level."
+  calculator={() => ChargingTimeCalculator}
+  explanation={() => {
+    return `
 			<h2 class="text-base-content mb-4 text-xl font-semibold">How it works</h2>
 			<p class="text-base-content/70 mb-3">
 				Charging time is affected by multiple factors:
@@ -20,5 +20,5 @@
 				<li>DC fast charging typically slows down above 80% to protect the battery</li>
 			</ul>
 		`;
-	}}
+  }}
 />

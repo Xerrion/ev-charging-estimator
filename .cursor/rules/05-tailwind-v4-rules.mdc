@@ -1,0 +1,121 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+ # Tailwind CSS v4 Upgrade Guidelines
+
+This rule provides guidance for transitioning from Tailwind CSS v3 to v4. It should be applied when:
+
+1. Writing new components or styles
+2. Updating existing components
+3. Troubleshooting CSS issues
+4. Implementing new design features
+
+## Key Changes
+
+### Browser Support
+- Tailwind CSS v4 targets Safari 16.4+, Chrome 111+, and Firefox 128+
+- No support for older browsers (use v3.4 for legacy browsers)
+
+### Import Syntax
+```css
+/* v3 (old) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* v4 (new) */
+@import "tailwindcss";
+```
+
+### CSS Variables for Theme Values
+```css
+/* v3 (old) */
+.my-class {
+  background-color: theme(colors.red.500);
+}
+
+/* v4 (new) */
+.my-class {
+  background-color: var(--color-red-500);
+}
+```
+
+### Variant Stacking Order
+```html
+<!-- v3 (old) - right to left -->
+<ul class="py-4 *:first:pt-0 *:last:pb-0">
+
+<!-- v4 (new) - left to right -->
+<ul class="py-4 first:*:pt-0 last:*:pb-0">
+```
+
+### Variable Arbitrary Values
+```html
+<!-- v3 (old) -->
+<div class="bg-[--brand-color]"></div>
+
+<!-- v4 (new) -->
+<div class="bg-(--brand-color)"></div>
+```
+
+### Custom Utilities
+```css
+/* v3 (old) */
+@layer utilities {
+  .tab-4 {
+    tab-size: 4;
+  }
+}
+
+/* v4 (new) */
+@utility tab-4 {
+  tab-size: 4;
+}
+```
+
+### Component Libraries & CSS Modules
+For Vue, Svelte, or CSS modules files:
+
+```vue
+<!-- v4 approach for component styles -->
+<style>
+  /* Import definitions without duplicating CSS */
+  @reference "../../app.css";
+  
+  h1 {
+    @apply text-2xl font-bold text-red-500;
+  }
+  
+  /* Or better, use CSS variables directly */
+  p {
+    color: var(--text-red-500);
+    font-size: var(--font-size-lg);
+  }
+</style>
+```
+
+## Migration Tools
+
+Use the official upgrade tool for automated migration:
+```bash
+npx @tailwindcss/upgrade
+```
+
+## Package Changes
+
+- PostCSS plugin: `@tailwindcss/postcss`
+- Vite plugin: `@tailwindcss/vite`
+- CLI: `@tailwindcss/cli`
+
+## Best Practices
+
+1. Always use CSS variables for theme values when possible
+2. Test thoroughly in target browsers (no IE11 or older browser support)
+3. Avoid `theme()` function except for media queries
+4. Use `@reference` for component styles
+5. Use the new left-to-right variant stacking order
+6. Migrate custom utilities to use the `@utility` syntax
+
+[Source: Tailwind CSS Upgrade Guide](https://tailwindcss.com/docs/upgrade-guide)
