@@ -20,15 +20,23 @@
 
   // Subscribe to theme changes from the store
   themeStore.subscribe((storeTheme) => {
-    if (storeTheme && isInitialized) {
+    if (storeTheme && (isInitialized || typeof document === 'undefined')) {
       theme = storeTheme;
 
-      // Apply theme changes immediately if initialized
+      // Apply theme changes immediately if initialized and in browser
       if (typeof document !== 'undefined') {
-        document.body.setAttribute('data-theme', theme);
+        applyThemeToDocument(theme);
       }
     }
   });
+
+  // Helper function to apply theme consistently
+  function applyThemeToDocument(currentTheme: 'light' | 'dark') {
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      document.body.setAttribute('data-theme', currentTheme);
+    }
+  }
 
   // Apply theme changes and save to evSettings store
   $effect(() => {
@@ -36,8 +44,8 @@
     if (!isInitialized) return;
 
     if (typeof document !== 'undefined') {
-      // Use data-theme on body element as required by DaisyUI
-      document.body.setAttribute('data-theme', theme);
+      // Apply theme to both document elements
+      applyThemeToDocument(theme);
 
       // Save theme preference to centralized store
       settingsStore.update({ theme });
@@ -48,7 +56,7 @@
   onMount(() => {
     // Apply theme on mount
     if (typeof document !== 'undefined') {
-      document.body.setAttribute('data-theme', theme);
+      applyThemeToDocument(theme);
     }
 
     // Set initialized flag to allow the effect to run on future changes
@@ -60,6 +68,43 @@
     theme = theme === 'light' ? 'dark' : 'light';
   }
 </script>
+
+<svelte:head>
+    // Check localStorage for theme preference and apply immediately to prevent flicker
+    try {
+      const storedData = localStorage.getItem('ev-calculator-data');
+      let theme = 'light';
+
+      if (storedData) {
+        const data = JSON.parse(storedData);
+        // Check if theme exists and is valid
+        if (data && (data.theme === 'dark' || data.theme === 'light')) {
+          theme = data.theme;
+        }
+      } else {
+        // No stored preference, check system preference
+        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+
+      // Apply theme to both html and body elements to avoid flicker
+      document.documentElement.setAttribute('data-theme', theme);
+
+      // Style element to avoid FOUC (Flash of Unstyled Content)
+      const style = document.createElement('style');
+      style.textContent = `body { opacity: 0; }`;
+      document.head.appendChild(style);
+
+      // Remove the style when DOM is ready
+      window.addEventListener('DOMContentLoaded', () => {
+        document.body.setAttribute('data-theme', theme);
+        document.head.removeChild(style);
+        document.body.style.opacity = '1';
+        document.body.style.transition = 'opacity 0.2s ease-in-out';
+      });
+    } catch (error) {
+      console.error('Failed to apply theme from localStorage:', error);
+    }
+</svelte:head>
 
 <label class="flex cursor-pointer gap-2">
   {@html SunIcon}
