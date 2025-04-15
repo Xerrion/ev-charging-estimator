@@ -45,13 +45,7 @@
 
   // State
   let activeCalculator = $state<CalculatorType>(initialCalculator);
-  let calculatorComponent = $state<Component | null>(null);
   let calculatorProps = $state<Record<string, any>>({});
-
-  // Update active calculator component when tab changes
-  $effect(() => {
-    calculatorComponent = calculators[activeCalculator].component;
-  });
 
   // Handle tab change
   function changeCalculator(calculatorType: CalculatorType) {
@@ -144,9 +138,15 @@
   </Card>
 
   <!-- Calculator component -->
-  {#if calculatorComponent}
-    {@render calculatorComponent(calculatorProps)}
-  {/if}
+  <div class="calculator-container">
+    {#if activeCalculator === 'frequency'}
+      <FrequencyCalculator {...calculatorProps} />
+    {:else if activeCalculator === 'charging-time'}
+      <ChargingTimeCalculator {...calculatorProps} />
+    {:else if activeCalculator === 'cost'}
+      <CostCalculator {...calculatorProps} />
+    {/if}
+  </div>
 
   <!-- Explanation section -->
   {#if showExplanation}
