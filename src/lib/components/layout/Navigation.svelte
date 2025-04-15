@@ -25,7 +25,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
       </svg>
     </button>
-    <ul class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow">
+    <ul class="menu menu-lg dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 border p-2 shadow">
       {#each navItems as item}
         {@const isActive = page.url.pathname === item.path}
         <li>
@@ -49,7 +49,7 @@
         <li>
           <a
             href={item.path}
-            class={isActive ? 'text-primary font-medium' : ''}
+            class={isActive ? 'text-primary disabled font-medium' : ''}
             aria-current={isActive ? 'page' : undefined}
           >
             {item.label}
