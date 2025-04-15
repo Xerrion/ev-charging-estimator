@@ -8,6 +8,7 @@
     monthlyCost: number;
     annualCost: number;
     energyPerCharge: number;
+    currency?: string;
   };
 
   type StatItem = {
@@ -42,37 +43,38 @@
         monthlyCost: results.monthlyCost,
         annualCost: results.annualCost,
         energyPerCharge: results.energyPerCharge,
-        currency,
+        currency: results.currency || currency,
         chargeProvider
       });
     } else {
       // Default empty stats with N/A values when there's an error
+      const displayCurrency = results.currency || currency;
       stats = [
         {
           title: 'Cost Per Charge',
           value: 'N/A',
-          unit: currency,
+          unit: displayCurrency,
           description: 'Estimated cost for a single charging session',
           color: 'accent'
         },
         {
           title: 'Weekly Cost',
           value: 'N/A',
-          unit: currency,
+          unit: displayCurrency,
           description: 'Projected weekly charging expenses',
           color: 'primary'
         },
         {
           title: 'Monthly Cost',
           value: 'N/A',
-          unit: currency,
+          unit: displayCurrency,
           description: 'Projected monthly charging expenses',
           color: 'info'
         },
         {
           title: 'Annual Cost',
           value: 'N/A',
-          unit: currency,
+          unit: displayCurrency,
           description: 'Projected annual charging expenses',
           color: 'success'
         },

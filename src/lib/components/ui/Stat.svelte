@@ -19,7 +19,7 @@
 <div class="stat place-items-center">
   <div class="stat-title">{title}</div>
   <div class="stat-value text-{color}">
-    {formatValue(value)}{value ? unit : ''}
+    {formatValue(value)}{value ? ' ' + unit : ''}
   </div>
   {#if description}
     <div class="stat-desc">{description}</div>

@@ -16,6 +16,10 @@
   let selectedCurrency = $state(DEFAULT_VALUES.selectedCurrency);
   let currencyOptions = $state(getCurrencyOptions());
 
+  $effect(() => {
+    console.log('selectedCurrency', selectedCurrency);
+  });
+
   // Define base input fields (common for both rate types)
   const baseInputFields = [
     {
@@ -241,6 +245,7 @@
   statsComponent={CostStats}
   getTips={getCostTips}
   {getErrorTips}
+  currency={selectedCurrency}
 >
   <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
     <!-- Rate Type Selection -->
@@ -279,15 +284,7 @@
         <label for="currency-select" class="label">
           <span class="label-text">Select Currency</span>
         </label>
-        <select
-          id="currency-select"
-          class="select select-bordered w-full"
-          value={selectedCurrency}
-          onchange={(event) => {
-            const target = event.target as HTMLSelectElement;
-            handleCurrencyChange(target.value);
-          }}
-        >
+        <select id="currency-select" class="select select-bordered w-full" bind:value={selectedCurrency}>
           {#each currencyOptions as option}
             <option value={option.value}>{option.label}</option>
           {/each}

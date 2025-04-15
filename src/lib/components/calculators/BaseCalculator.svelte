@@ -18,7 +18,8 @@
     statsComponent,
     getTips = () => [],
     getErrorTips = () => ['Check your input values and try again'],
-    children
+    children,
+    currency
   } = $props<{
     title?: string;
     inputFields: Array<{
@@ -39,6 +40,7 @@
     getTips?: (data: Record<string, any>) => string[];
     getErrorTips?: () => string[];
     children?: () => unknown;
+    currency?: string;
   }>();
 
   // Component state
@@ -68,27 +70,16 @@
           // Use the storeKey if provided, otherwise use the field key
           const storeKey = field.storeKey || field.key;
 
-          // Handle different field types differently
-          if (field.type === 'select' || field.type === 'radio') {
-            // For select/radio inputs, get the string value
-            const value =
-              settings[storeKey as keyof typeof settings] ??
-              DEFAULT_VALUES[storeKey as keyof typeof DEFAULT_VALUES] ??
-              (field.options && field.options.length > 0 ? field.options[0].value : '');
+          // Get value from settings or use default
+          const value = (settings[storeKey as keyof typeof settings] ??
+            DEFAULT_VALUES[storeKey as keyof typeof DEFAULT_VALUES] ??
+            0) as number;
 
-            data[field.key] = value;
+          // Special case for percentage values stored as fractions
+          if (field.unit === '%' && storeKey.includes('Fraction') && value <= 1) {
+            data[field.key] = value * 100;
           } else {
-            // For numeric inputs
-            const value = (settings[storeKey as keyof typeof settings] ??
-              DEFAULT_VALUES[storeKey as keyof typeof DEFAULT_VALUES] ??
-              0) as number;
-
-            // Special case for percentage values stored as fractions
-            if (field.unit === '%' && storeKey.includes('Fraction') && value <= 1) {
-              data[field.key] = value * 100;
-            } else {
-              data[field.key] = value;
-            }
+            data[field.key] = value;
           }
 
           return data;
@@ -223,8 +214,8 @@
       // Find the corresponding field definition
       const field = inputFields.find((f: (typeof inputFields)[number]) => f.key === key);
 
-      // Skip validation for select/radio inputs - they're always valid once selected
-      if (field?.type === 'select' || field?.type === 'radio') return true;
+      // Skip validation for select inputs - they're always valid once selected
+      if (field?.type === 'select') return true;
 
       // Numeric inputs should be greater than 0
       return Number(value) > 0;
@@ -257,6 +248,6 @@
 {:else}
   {@render children?.()}
   <ParameterForm {title} {inputs} />
-  <StatsComponent {results} {formData} title="Results" />
+  <StatsComponent {results} {formData} title="Results" {currency} />
   <Tips title="Tips" {tips} color="success" />
 {/if}
