@@ -182,12 +182,12 @@
 {/if}
 
 {#if isLoading}
+  <TipsSkeleton />
   <ParameterFormSkeleton rows={inputFields.length} />
   <StatsSkeleton columns={3} />
-  <TipsSkeleton />
 {:else}
+  <Tips title="Tips" {tips} color="success" />
   {@render children?.()}
   <ParameterForm {title} {inputs} />
   <StatsComponent {results} {formData} title="Results" />
-  <Tips title="Tips" {tips} color="success" />
 {/if}
