@@ -6,7 +6,7 @@
     id: string;
     label: string;
     min: number;
-    max: number;
+    max: number; 
     step: number;
     unit: string;
     allowDecimals: boolean;

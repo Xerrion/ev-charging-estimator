@@ -1,9 +1,9 @@
 <script lang="ts">
-  import successIcon from '$lib/assets/icons/success.svg';
-  import infoIcon from '$lib/assets/icons/info.svg';
-  import warningIcon from '$lib/assets/icons/warning.svg';
-  import errorIcon from '$lib/assets/icons/error.svg';
-  import xIcon from '$lib/assets/icons/x.svg';
+  import successIcon from '$lib/assets/icons/success.svg?raw';
+  import infoIcon from '$lib/assets/icons/info.svg?raw';
+  import warningIcon from '$lib/assets/icons/warning.svg?raw';
+  import errorIcon from '$lib/assets/icons/error.svg?raw';
+  import xIcon from '$lib/assets/icons/x.svg?raw';
 
   type AlertType = 'info' | 'success' | 'warning' | 'error';
   type AlertStyle = 'default' | 'soft' | 'outline';
@@ -64,11 +64,9 @@
 </script>
 
 {#if visible}
-  <div class="alert alert-{type} {styleClass} {className}">
-    <div class="flex items-center">
-      <img src={icon} alt="{type} icon" class="mr-2 h-5 w-5" />
-      <span>{message}</span>
-    </div>
+  <div role="alert" class="alert alert-{type} {styleClass()} {className}">
+    {@html icon}
+    <span>{message}</span>
     {#if dismissible}
       <button class="btn btn-ghost btn-sm" onclick={dismiss}>
         <img src={xIcon} alt="Close" class="h-5 w-5" />

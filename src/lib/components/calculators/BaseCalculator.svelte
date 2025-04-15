@@ -16,7 +16,8 @@
     calculateFn,
     statsComponent,
     getTips = () => [],
-    getErrorTips = () => ['Check your input values and try again']
+    getErrorTips = () => ['Check your input values and try again'],
+    children
   } = $props<{
     title?: string;
     inputFields: Array<{
@@ -34,6 +35,7 @@
     statsComponent: any;
     getTips?: (data: Record<string, any>) => string[];
     getErrorTips?: () => string[];
+    children?: () => unknown;
   }>();
 
   // Component state
@@ -184,6 +186,7 @@
   <StatsSkeleton columns={3} />
   <TipsSkeleton />
 {:else}
+  {@render children?.()}
   <ParameterForm {title} {inputs} />
   <StatsComponent {results} {formData} title="Results" />
   <Tips title="Tips" {tips} color="success" />

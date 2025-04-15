@@ -232,58 +232,6 @@
     settingsStore.update({ selectedCurrency });
   }
 </script>
-<div class="flex flex-col gap-4">
-<!-- Rate Type Selection -->
-<Card title="Rate Selection">
-  <div class="flex flex-wrap gap-4">
-    <div class="form-control">
-      <label class="label cursor-pointer">
-        <span class="label-text mr-2">Flat Rate</span>
-        <input
-          type="radio"
-          name="rate-type"
-          class="radio"
-          checked={rateType === 'flat'}
-          onclick={() => handleRateTypeChange('flat')}
-        />
-      </label>
-    </div>
-    <div class="form-control">
-      <label class="label cursor-pointer">
-        <span class="label-text mr-2">Variable Rate (Time-of-Use)</span>
-        <input
-          type="radio"
-          name="rate-type"
-          class="radio"
-          checked={rateType === 'variable'}
-          onclick={() => handleRateTypeChange('variable')}
-        />
-      </label>
-    </div>
-  </div>
-</Card>
-
-<!-- Currency selector -->
-<Card title="Currency">
-  <div class="form-control w-full">
-    <label for="currency-select" class="label">
-      <span class="label-text">Select Currency</span>
-    </label>
-    <select
-      id="currency-select"
-      class="select select-bordered w-full"
-      value={selectedCurrency}
-      onchange={(event) => {
-        const target = event.target as HTMLSelectElement;
-        handleCurrencyChange(target.value);
-      }}
-    >
-      {#each currencyOptions as option}
-        <option value={option.value}>{option.label}</option>
-      {/each}
-    </select>
-  </div>
-</Card>
 
 <BaseCalculator
   title="Cost Parameters"
@@ -292,4 +240,58 @@
   statsComponent={CostStats}
   getTips={getCostTips}
   {getErrorTips}
-/>
+>
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <!-- Rate Type Selection -->
+    <Card title="Rate Selection">
+      <div class="flex flex-wrap gap-4">
+        <div class="form-control">
+          <label class="label cursor-pointer">
+            <span class="label-text mr-2">Flat Rate</span>
+            <input
+              type="radio"
+              name="rate-type"
+              class="radio"
+              checked={rateType === 'flat'}
+              onclick={() => handleRateTypeChange('flat')}
+            />
+          </label>
+        </div>
+        <div class="form-control">
+          <label class="label cursor-pointer">
+            <span class="label-text mr-2">Variable Rate (Time-of-Use)</span>
+            <input
+              type="radio"
+              name="rate-type"
+              class="radio"
+              checked={rateType === 'variable'}
+              onclick={() => handleRateTypeChange('variable')}
+            />
+          </label>
+        </div>
+      </div>
+    </Card>
+
+    <!-- Currency selector -->
+    <Card title="Currency">
+      <div class="form-control w-full">
+        <label for="currency-select" class="label">
+          <span class="label-text">Select Currency</span>
+        </label>
+        <select
+          id="currency-select"
+          class="select select-bordered w-full"
+          value={selectedCurrency}
+          onchange={(event) => {
+            const target = event.target as HTMLSelectElement;
+            handleCurrencyChange(target.value);
+          }}
+        >
+          {#each currencyOptions as option}
+            <option value={option.value}>{option.label}</option>
+          {/each}
+        </select>
+      </div>
+    </Card>
+  </div>
+</BaseCalculator>

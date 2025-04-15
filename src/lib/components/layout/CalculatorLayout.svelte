@@ -21,16 +21,10 @@
 </script>
 
 <div class="w-full">
-  <Card className="mb-6">
-    <h2 class="text-base-content mb-4 text-xl font-semibold">{title}</h2>
-    <p class="text-base-content/70 mb-6">
-      {description}
-    </p>
-
-    {#if CalculatorComponent}
-      <CalculatorComponent {...calculatorProps} />
-    {/if}
-  </Card>
+  <Card className="mb-6" {title} {description}></Card>
+  {#if CalculatorComponent}
+    <CalculatorComponent {...calculatorProps} />
+  {/if}
 
   {#if explanation}
     <Card>

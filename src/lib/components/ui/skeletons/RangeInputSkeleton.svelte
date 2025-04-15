@@ -1,3 +1,7 @@
+<script>
+  import Card from '../Card.svelte';
+</script>
+
 <div class="mb-5">
   <div class="mb-3 flex items-center justify-between">
     <!-- Parameter name / Label -->

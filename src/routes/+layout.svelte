@@ -99,8 +99,26 @@
     </div>
   </header>
 
-  <main class="container-custom flex-grow py-8">
-    <div class="mx-auto w-full max-w-3xl">
+  <main class="container-custom flex-grow">
+    {#if $page.url.pathname === '/'}
+      <div class="hero bg-base-200 min-h-[70vh] min-w-full">
+        <div class="hero-content glass text-center">
+          <div class=" max-w-md p-8">
+            <h1 class="text-primary text-5xl font-bold">EV Estimator Hub</h1>
+            <p class="py-6">
+              Simplify your electric vehicle experience with our suite of easy-to-use calculators for charging
+              frequency, time, and cost estimation.
+            </p>
+            <div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
+              <a href="/frequency" class="btn btn-primary">Charge Frequency</a>
+              <a href="/charging-time" class="btn btn-outline">Charging Time</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {/if}
+
+    <div class="mx-auto w-full max-w-3xl py-8">
       {@render children()}
     </div>
   </main>

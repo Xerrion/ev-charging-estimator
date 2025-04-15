@@ -1,4 +1,8 @@
-<div class="rounded-box p-6 shadow">
+<script>
+  import Card from '../Card.svelte';
+</script>
+
+<Card>
   <!-- Title -->
   <div class="mb-4">
     <div class="skeleton h-6 w-48"></div>
@@ -11,4 +15,4 @@
     <div class="skeleton h-4 w-4/5"></div>
     <div class="skeleton h-4 w-9/12"></div>
   </div>
-</div>
+</Card>
