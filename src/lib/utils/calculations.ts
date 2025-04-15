@@ -31,20 +31,26 @@ export function calculateWeeklyCharges({
 }): number {
   if (effectiveRangeKm <= 0) return 0;
 
-  // Calculate the raw ratio of distance to range
+  // Calculate the ratio of distance to range
   const ratio = weeklyDistanceKm / effectiveRangeKm;
 
-  // Calculate the basic number of charges without rounding
-  const basicChargesRaw = ratio;
+  // Basic number of charges (ceiled - gives us at least enough charges to cover the distance)
+  const basicCharges = Math.ceil(ratio);
 
-  // Calculate the rounded basic charges
-  const basicCharges = Math.ceil(basicChargesRaw);
+  // Check if we're just below a whole number (within 10% of next integer)
+  // For example, if ratio is 1.91, we want to add a safety charge to make it 3
+  // Since 1.91 is within 0.1 of 2.0 (next integer)
+  const fractionalPart = ratio % 1;
+  const isCloseToNextInteger = fractionalPart > 0.9;
 
-  // Only add safety charge if we're just below a whole number (prevents erratic jumps)
-  // If the fractional part is greater than 0.9, we're very close to the next integer
-  const isCloseToLimit = ratio % 1 > 0.9;
+  if (isCloseToNextInteger) {
+    // If we're very close to the next integer, add a safety charge
+    // For ratio = 0.91, this gives 1+1=2
+    // For ratio = 1.91, this gives 2+1=3
+    return basicCharges + 1;
+  }
 
-  return isCloseToLimit ? Math.floor(ratio) + 1 : basicCharges;
+  return basicCharges;
 }
 
 /**
@@ -334,8 +340,9 @@ export function isSafetyChargeAdded({
   // Calculate the ratio of distance to range
   const ratio = weeklyDistanceKm / effectiveRangeKm;
 
-  // Check if we're very close to the next whole number (>90% of the way)
-  return ratio % 1 > 0.9;
+  // Check if we're very close to the next whole number (>90% of the way there)
+  const fractionalPart = ratio % 1;
+  return fractionalPart > 0.9;
 }
 
 /**

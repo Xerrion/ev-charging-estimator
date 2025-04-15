@@ -138,12 +138,13 @@ export function getFrequencyTips(params: {
 
   // Check if we're very close to the next whole number (>90% of the way)
   const ratio = weeklyDistanceKm / effectiveRangeKm;
-  const isCloseToLimit = ratio % 1 > 0.9;
+  const fractionalPart = ratio % 1;
+  const isCloseToLimit = fractionalPart > 0.9;
 
   // Tips based on weekly charging frequency
   if (isCloseToLimit) {
-    tips.push('An extra charge has been added because your range is very close to your weekly distance');
-    tips.push('This safety margin helps prevent unexpected range issues due to varied driving conditions');
+    tips.push('An extra safety charge has been added to account for your actual driving needs');
+    tips.push('This helps prevent unexpected range issues due to varied driving conditions');
   } else if (weeklyCharges < 1) {
     tips.push('Your EV can handle your weekly driving needs with minimal charging');
     tips.push('Consider charging only when battery drops below 30% for optimal battery health');
