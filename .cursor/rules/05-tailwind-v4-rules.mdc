@@ -118,4 +118,4 @@ npx @tailwindcss/upgrade
 5. Use the new left-to-right variant stacking order
 6. Migrate custom utilities to use the `@utility` syntax
 
-[Source: Tailwind CSS Upgrade Guide](https://tailwindcss.com/docs/upgrade-guide)
+[Source: Tailwind CSS Upgrade Guide](mdc:https:/tailwindcss.com/docs/upgrade-guide)
