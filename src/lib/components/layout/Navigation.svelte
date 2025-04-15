@@ -18,16 +18,23 @@
 </script>
 
 <nav class="overflow-x-auto">
-	<div class="tabs tabs-boxed w-full">
-		{#each navItems as item}
-			{@const isActive = $page.url.pathname === item.path}
-			<a
-				href={item.path}
-				class="tab tab-lg {isActive ? 'tab-active' : ''}"
-				aria-current={isActive ? 'page' : undefined}
+	<div class="flex flex-col gap-1">
+		<div class="tabs tabs-boxed w-full">
+			{#each navItems as item}
+				{@const isActive = $page.url.pathname === item.path}
+				<a
+					href={item.path}
+					class="tab tab-lg {isActive ? 'tab-active' : ''}"
+					aria-current={isActive ? 'page' : undefined}
+				>
+					{item.label}
+				</a>
+			{/each}
+		</div>
+		<div class="flex justify-end">
+			<a href="/privacy" class="text-base-content/50 hover:text-base-content text-xs"
+				>Privacy Policy</a
 			>
-				{item.label}
-			</a>
-		{/each}
+		</div>
 	</div>
 </nav>
