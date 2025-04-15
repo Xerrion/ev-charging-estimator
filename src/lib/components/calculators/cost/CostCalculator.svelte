@@ -172,7 +172,9 @@
       min: INPUT_RANGES.ELECTRICITY_RATE.MIN,
       max: INPUT_RANGES.ELECTRICITY_RATE.MAX,
       step: INPUT_RANGES.ELECTRICITY_RATE.STEP,
-      unit: `${selectedCurrency}/kWh`,
+      get unit() {
+        return `${selectedCurrency}/kWh`;
+      },
       allowDecimals: true,
       getValue: () => formData.electricityRate,
       setValue: (val: number) => {
@@ -233,14 +235,7 @@
   ];
 
   // Make inputs reactive to currency changes
-  const inputs = $derived(
-    baseInputs.map((input) => {
-      if (input.id === 'electricity-rate') {
-        return { ...input, unit: `${selectedCurrency}/kWh` };
-      }
-      return input;
-    })
-  );
+  const inputs = baseInputs;
 
   // Additional inputs for variable rate pricing
   const baseVariableRateInputs = [
@@ -250,7 +245,9 @@
       min: INPUT_RANGES.ELECTRICITY_RATE.MIN,
       max: INPUT_RANGES.ELECTRICITY_RATE.MAX,
       step: INPUT_RANGES.ELECTRICITY_RATE.STEP,
-      unit: `${selectedCurrency}/kWh`,
+      get unit() {
+        return `${selectedCurrency}/kWh`;
+      },
       allowDecimals: true,
       getValue: () => formData.peakElectricityRate,
       setValue: (val: number) => {
@@ -266,7 +263,9 @@
       min: INPUT_RANGES.ELECTRICITY_RATE.MIN,
       max: INPUT_RANGES.ELECTRICITY_RATE.MAX,
       step: INPUT_RANGES.ELECTRICITY_RATE.STEP,
-      unit: `${selectedCurrency}/kWh`,
+      get unit() {
+        return `${selectedCurrency}/kWh`;
+      },
       allowDecimals: true,
       getValue: () => formData.offPeakElectricityRate,
       setValue: (val: number) => {
@@ -295,14 +294,7 @@
   ];
 
   // Make variable rate inputs reactive to currency changes
-  const variableRateInputs = $derived(
-    baseVariableRateInputs.map((input) => {
-      if (input.id === 'peak-electricity-rate' || input.id === 'off-peak-electricity-rate') {
-        return { ...input, unit: `${selectedCurrency}/kWh` };
-      }
-      return input;
-    })
-  );
+  const variableRateInputs = baseVariableRateInputs;
 
   /**
    * Initialize component state from the evSettings store
