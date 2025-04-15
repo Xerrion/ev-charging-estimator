@@ -6,11 +6,13 @@
     title,
     description,
     calculator,
+    calculatorProps = {},
     explanation = null
   } = $props<{
     title: string;
     description: string;
     calculator: () => Component;
+    calculatorProps?: Record<string, any>;
     explanation?: () => string;
   }>();
 
@@ -26,7 +28,7 @@
     </p>
 
     {#if CalculatorComponent}
-      <CalculatorComponent />
+      <CalculatorComponent {...calculatorProps} />
     {/if}
   </Card>
 

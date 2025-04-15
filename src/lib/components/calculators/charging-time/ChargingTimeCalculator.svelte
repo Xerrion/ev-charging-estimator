@@ -9,7 +9,8 @@
   import ParameterForm from '$lib/components/ui/ParameterForm.svelte';
   import ChargingTimeStats from './ChargingTimeStats.svelte';
   import { calculateChargingTime } from '$lib/utils/calculations';
-  import { DEFAULT_VALUES } from '$lib/utils/constants';
+  import { DEFAULT_VALUES, INPUT_RANGES } from '$lib/utils/constants';
+  import Alert from '$lib/components/ui/Alert.svelte';
 
   // Define Result type
   type ChargingTimeResult = {
@@ -18,11 +19,13 @@
     energyNeeded: number;
     actualChargingPower: number;
     technicalLimitExceeded?: boolean;
+    limitingFactor?: 'c-rate' | 'phases' | 'temperature' | null;
   };
 
   // Component state
   let isLoading = $state(true);
   let isInitialized = $state(false);
+  let error = $state<string | null>(null);
 
   // Form data - will be populated from the store
   let formData = $state({
@@ -31,8 +34,8 @@
     targetCharge: DEFAULT_VALUES.targetCharge, // percent
     chargingPower: DEFAULT_VALUES.chargingPower, // kW
     chargingEfficiency: DEFAULT_VALUES.chargingEfficiency, // percent
-    temperatureC: 20, // Default to room temperature (20°C)
-    phases: 3 // Default to 3-phase charging
+    temperatureC: DEFAULT_VALUES.temperatureC, // Default to room temperature (20°C)
+    phases: DEFAULT_VALUES.phases // Default to 3-phase charging
   });
 
   // Results
@@ -106,9 +109,9 @@
     {
       id: 'battery-capacity',
       label: 'Battery Capacity',
-      min: 20,
-      max: 150,
-      step: 1,
+      min: INPUT_RANGES.BATTERY_CAPACITY.MIN,
+      max: INPUT_RANGES.BATTERY_CAPACITY.MAX,
+      step: INPUT_RANGES.BATTERY_CAPACITY.STEP,
       unit: 'kWh',
       allowDecimals: false,
       getValue: () => formData.batteryKwh,
@@ -122,9 +125,9 @@
     {
       id: 'initial-charge',
       label: 'Initial Charge',
-      min: 0,
-      max: 100,
-      step: 1,
+      min: INPUT_RANGES.BATTERY_CHARGE.MIN,
+      max: INPUT_RANGES.BATTERY_CHARGE.MAX,
+      step: INPUT_RANGES.BATTERY_CHARGE.STEP,
       unit: '%',
       allowDecimals: false,
       getValue: () => formData.initialCharge,
@@ -138,9 +141,9 @@
     {
       id: 'target-charge',
       label: 'Target Charge',
-      min: 0,
-      max: 100,
-      step: 1,
+      min: INPUT_RANGES.BATTERY_CHARGE.MIN,
+      max: INPUT_RANGES.BATTERY_CHARGE.MAX,
+      step: INPUT_RANGES.BATTERY_CHARGE.STEP,
       unit: '%',
       allowDecimals: false,
       getValue: () => formData.targetCharge,
@@ -154,9 +157,9 @@
     {
       id: 'charging-power',
       label: 'Charging Power',
-      min: 3.7,
-      max: 350,
-      step: 0.1,
+      min: INPUT_RANGES.CHARGING_POWER.MIN,
+      max: INPUT_RANGES.CHARGING_POWER.MAX,
+      step: INPUT_RANGES.CHARGING_POWER.STEP,
       unit: 'kW',
       allowDecimals: true,
       getValue: () => formData.chargingPower,
@@ -170,9 +173,9 @@
     {
       id: 'charging-efficiency',
       label: 'Charging Efficiency',
-      min: 70,
-      max: 100,
-      step: 1,
+      min: INPUT_RANGES.CHARGING_EFFICIENCY.MIN,
+      max: INPUT_RANGES.CHARGING_EFFICIENCY.MAX,
+      step: INPUT_RANGES.CHARGING_EFFICIENCY.STEP,
       unit: '%',
       allowDecimals: false,
       getValue: () => formData.chargingEfficiency,
@@ -186,30 +189,32 @@
     {
       id: 'temperature',
       label: 'Battery Temperature',
-      min: -20,
-      max: 50,
-      step: 1,
+      min: INPUT_RANGES.TEMPERATURE.MIN,
+      max: INPUT_RANGES.TEMPERATURE.MAX,
+      step: INPUT_RANGES.TEMPERATURE.STEP,
       unit: '°C',
       allowDecimals: false,
       getValue: () => formData.temperatureC,
       setValue: (val: number) => {
         if (formData.temperatureC === val) return;
         formData.temperatureC = Math.round(val);
+        settingsStore.update({ temperatureC: formData.temperatureC });
         saveAndCalculate();
       }
     },
     {
       id: 'phases',
       label: 'Charging Phases',
-      min: 1,
-      max: 3,
-      step: 1,
+      min: INPUT_RANGES.PHASES.MIN,
+      max: INPUT_RANGES.PHASES.MAX,
+      step: INPUT_RANGES.PHASES.STEP,
       unit: '',
       allowDecimals: false,
       getValue: () => formData.phases,
       setValue: (val: number) => {
         if (formData.phases === val) return;
         formData.phases = Math.round(val);
+        settingsStore.update({ phases: formData.phases });
         saveAndCalculate();
       }
     }
@@ -229,8 +234,8 @@
           targetCharge: settings.targetCharge,
           chargingPower: settings.chargingPower,
           chargingEfficiency: settings.chargingEfficiency,
-          temperatureC: settings.temperatureC ?? 20, // Provide default if not in settings
-          phases: settings.phases ?? 3 // Provide default if not in settings
+          temperatureC: settings.temperatureC ?? DEFAULT_VALUES.temperatureC, // Provide default if not in settings
+          phases: settings.phases ?? DEFAULT_VALUES.phases // Provide default if not in settings
         };
 
         // Set initialized flag
@@ -244,6 +249,7 @@
       })();
     } catch (err) {
       console.error('Error initializing from settings:', err);
+      error = err instanceof Error ? err.message : 'Failed to initialize settings';
       isLoading = false;
     }
   }
@@ -262,6 +268,9 @@
    */
   function calculateResults(): void {
     try {
+      // Reset error state
+      error = null;
+
       // Use the utility function to calculate results
       results = calculateChargingTime({
         batteryKwh: formData.batteryKwh,
@@ -277,6 +286,7 @@
       updateTips();
     } catch (err) {
       console.error('Calculation error:', err);
+      error = err instanceof Error ? err.message : 'Failed to calculate results';
 
       // Reset results on error
       results = {
@@ -311,29 +321,20 @@
   }
 </script>
 
-<div class="flex w-full flex-col gap-6">
-  {#if isLoading}
-    <!-- Skeleton loading state -->
-    <Card title="Charging Parameters">
-      <div class="space-y-8">
-        {#each Array(inputs.length) as _, i}
-          <RangeInputSkeleton />
-        {/each}
-      </div>
-    </Card>
+{#if error}
+  <Alert type="error" message={error} />
+{/if}
 
-    <div class="mt-2">
-      <StatsSkeleton columns={2} />
-    </div>
-
-    <div class="mt-2">
-      <TipsSkeleton />
-    </div>
-  {:else}
+{#if isLoading}
+  <div class="grid gap-6">
+    <RangeInputSkeleton />
+    <StatsSkeleton />
+    <TipsSkeleton />
+  </div>
+{:else}
+  <div class="grid gap-6">
     <ParameterForm title="Charging Parameters" {inputs} />
-
-    <ChargingTimeStats {results} {formData} />
-
+    <ChargingTimeStats {results} {formData} title="Charging Results" />
     <Tips title="Charging Recommendations" tips={chargingTips} color="info" />
-  {/if}
-</div>
+  </div>
+{/if}

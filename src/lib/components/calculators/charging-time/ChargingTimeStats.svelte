@@ -2,6 +2,7 @@
   import Stats from '$lib/components/ui/Stats.svelte';
   import { formatTime, generateChargingTimeStats } from '$lib/utils/calculations';
   import Alert from '$lib/components/ui/Alert.svelte';
+  import Card from '$lib/components/ui/Card.svelte';
 
   type Result = {
     chargingTimeHours: number;
@@ -20,7 +21,11 @@
     color?: 'primary' | 'secondary' | 'accent' | 'info' | 'success' | 'warning' | 'error';
   };
 
-  let { results, formData } = $props<{
+  let {
+    results,
+    formData,
+    title = 'Charging Results'
+  } = $props<{
     results: Result;
     formData: {
       batteryKwh: number;
@@ -29,6 +34,7 @@
       chargingPower: number;
       chargingEfficiency: number;
     };
+    title?: string;
   }>();
 
   let stats = $state<StatItem[]>([]);
@@ -78,25 +84,27 @@
   }
 </script>
 
-{#if results.technicalLimitExceeded}
-  <Alert
-    type="warning"
-    message="The charging power exceeds technical limits for this battery size. The calculator has adjusted to a safer maximum charging rate."
-  />
-{/if}
+<Card {title}>
+  {#if results.technicalLimitExceeded}
+    <Alert
+      type="warning"
+      message="The charging power exceeds technical limits for this battery size. The calculator has adjusted to a safer maximum charging rate."
+    />
+  {/if}
 
-{#if results.limitingFactor === 'temperature'}
-  <Alert
-    type="info"
-    message="Battery temperature affects charging speed. Cold batteries charge significantly slower."
-  />
-{/if}
+  {#if results.limitingFactor === 'temperature'}
+    <Alert
+      type="info"
+      message="Battery temperature affects charging speed. Cold batteries charge significantly slower."
+    />
+  {/if}
 
-{#if results.limitingFactor === 'phases'}
-  <Alert
-    type="info"
-    message="Charging is limited by the available phases. Multi-phase charging enables faster charging."
-  />
-{/if}
+  {#if results.limitingFactor === 'phases'}
+    <Alert
+      type="info"
+      message="Charging is limited by the available phases. Multi-phase charging enables faster charging."
+    />
+  {/if}
 
-<Stats {stats} />
+  <Stats {stats} />
+</Card>

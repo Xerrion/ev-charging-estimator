@@ -14,6 +14,11 @@ export type StorageData = {
   theme: 'light' | 'dark';
   temperatureC: number;
   phases: number;
+  electricityRate: number;
+  peakElectricityRate: number;
+  offPeakElectricityRate: number;
+  chargingDuringOffPeak: number;
+  selectedCurrency: string;
 };
 
 /**
@@ -138,7 +143,11 @@ function validateStoredData(data: unknown): StorageData {
       'chargingPower',
       'chargingEfficiency',
       'temperatureC',
-      'phases'
+      'phases',
+      'electricityRate',
+      'peakElectricityRate',
+      'offPeakElectricityRate',
+      'chargingDuringOffPeak'
     ] as const;
 
     // Type-safe way to iterate through the numeric fields
@@ -151,6 +160,11 @@ function validateStoredData(data: unknown): StorageData {
     // Handle theme separately
     if (typedData.theme === 'dark' || typedData.theme === 'light') {
       result.theme = typedData.theme;
+    }
+
+    // Handle selected currency
+    if (typeof typedData.selectedCurrency === 'string') {
+      result.selectedCurrency = typedData.selectedCurrency;
     }
   }
 

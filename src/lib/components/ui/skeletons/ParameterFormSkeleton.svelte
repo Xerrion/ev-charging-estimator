@@ -1,7 +1,7 @@
 <script lang="ts">
   import Card from '../Card.svelte';
   import RangeInputSkeleton from './RangeInputSkeleton.svelte';
-  let { rows = 3, title = 'EV Parameters' } = $props<{
+  let { rows = 3, title = 'Parameters' } = $props<{
     rows?: number;
     title?: string;
   }>();

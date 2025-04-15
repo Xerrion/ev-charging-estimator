@@ -29,6 +29,48 @@ export const INPUT_RANGES = {
     MIN: 60,
     MAX: 100,
     STEP: 1
+  },
+
+  // Battery charge percentage
+  BATTERY_CHARGE: {
+    MIN: 0,
+    MAX: 100,
+    STEP: 1
+  },
+
+  // Charging power in kilowatts
+  CHARGING_POWER: {
+    MIN: 3.7,
+    MAX: 350,
+    STEP: 0.1
+  },
+
+  // Charging efficiency in percentage
+  CHARGING_EFFICIENCY: {
+    MIN: 70,
+    MAX: 100,
+    STEP: 1
+  },
+
+  // Temperature in Celsius
+  TEMPERATURE: {
+    MIN: -20,
+    MAX: 50,
+    STEP: 1
+  },
+
+  // Charging phases
+  PHASES: {
+    MIN: 1,
+    MAX: 3,
+    STEP: 1
+  },
+
+  // Electricity rate in currency units per kWh
+  ELECTRICITY_RATE: {
+    MIN: 0.05,
+    MAX: 100.0,
+    STEP: 0.01
   }
 };
 
@@ -44,5 +86,10 @@ export const DEFAULT_VALUES = {
   chargingPower: 11,
   chargingEfficiency: 90,
   temperatureC: 20, // Default to room temperature (20°C)
-  phases: 3 // Default to 3-phase charging
+  phases: 3, // Default to 3-phase charging
+  electricityRate: 0.15, // Default electricity rate per kWh
+  peakElectricityRate: 0.25, // Default peak electricity rate per kWh
+  offPeakElectricityRate: 0.1, // Default off-peak electricity rate per kWh
+  chargingDuringOffPeak: 70, // Default percentage of charging during off-peak hours
+  selectedCurrency: 'USD' // Default currency
 };

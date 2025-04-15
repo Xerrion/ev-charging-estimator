@@ -4,12 +4,13 @@
   import { getFrequencyTips, getErrorTips } from '$lib/utils/tips';
   import StatsSkeleton from '$lib/components/ui/skeletons/StatsSkeleton.svelte';
   import TipsSkeleton from '$lib/components/ui/skeletons/TipsSkeleton.svelte';
-  import EVStats from './FrequencyStats.svelte';
+  import RangeInputSkeleton from '$lib/components/ui/skeletons/RangeInputSkeleton.svelte';
+  import FrequencyStats from './FrequencyStats.svelte';
   import ParameterForm from '../../ui/ParameterForm.svelte';
   import { settingsStore } from '$lib/state/SettingsStore';
   import Alert from '$lib/components/ui/Alert.svelte';
-  import CardSkeleton from '$lib/components/ui/skeletons/CardSkeleton.svelte';
   import Tips from '$lib/components/ui/Tips.svelte';
+  import { formatValue } from '$lib/utils/formatters';
 
   type InputConfig = {
     id: string;
@@ -108,7 +109,7 @@
       getValue: () => formData.weeklyDistanceKm,
       setValue: (val: number) => {
         if (val === formData.weeklyDistanceKm) return;
-        formData.weeklyDistanceKm = formatValue(val, false);
+        formData.weeklyDistanceKm = formatValue(val);
         settingsStore.update({ weeklyDistanceKm: formData.weeklyDistanceKm });
         saveAndCalculate();
       }
@@ -125,7 +126,7 @@
       getValue: () => formData.batteryKwh,
       setValue: (val: number) => {
         if (val === formData.batteryKwh) return;
-        formData.batteryKwh = formatValue(val, false);
+        formData.batteryKwh = formatValue(val);
         settingsStore.update({ batteryKwh: formData.batteryKwh });
         saveAndCalculate();
       }
@@ -212,6 +213,9 @@
    */
   function calculateResults(): void {
     try {
+      // Reset error state
+      error = null;
+
       // Only calculate if all required values are valid numbers greater than 0
       if (isFormDataValid()) {
         results = weeklyEvChargeEstimator(formData);
@@ -221,6 +225,7 @@
       }
     } catch (err) {
       console.error('Calculation error:', err);
+      error = err instanceof Error ? err.message : 'Failed to calculate results';
       resetResults();
     }
   }
@@ -265,28 +270,22 @@
     };
     chargingTips = getFrequencyTips(calculationParams);
   }
-
-  /**
-   * Formats a value to ensure it's a valid number and handles decimals appropriately
-   */
-  function formatValue(val: number, allowDecimals: boolean): number {
-    if (isNaN(val)) return 0;
-    return allowDecimals ? val : Math.round(val);
-  }
 </script>
+
+{#if error}
+  <Alert type="error" message={error} />
+{/if}
 
 {#if isLoading}
   <div class="grid gap-6">
-    <CardSkeleton />
+    <RangeInputSkeleton />
     <StatsSkeleton />
     <TipsSkeleton />
   </div>
-{:else if error}
-  <Alert type="error" message={error} />
 {:else}
   <div class="grid gap-6">
     <ParameterForm title="EV Parameters" {inputs} />
-    <EVStats {results} {formData} />
+    <FrequencyStats {results} {formData} title="Frequency Results" />
     <Tips title="Charging Frequency Tips" tips={chargingTips} color="success" />
   </div>
 {/if}

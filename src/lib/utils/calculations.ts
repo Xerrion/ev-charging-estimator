@@ -449,3 +449,311 @@ export const REGIONAL_EMISSIONS = {
     electricityEmissionsGramPerKm: 90
   }
 };
+
+/**
+ * Estimates battery degradation based on charging characteristics and cycles
+ * This is a simplified model based on typical lithium-ion battery degradation patterns
+ */
+export function estimateBatteryDegradation({
+  batteryAgeYears = 0,
+  chargingCycles = 0,
+  fastChargingPercentage = 0,
+  regularlyChargedAbove90Percent = false,
+  regularlyDischargedBelow10Percent = false,
+  operatingInHighTemperatures = false
+}: {
+  batteryAgeYears?: number;
+  chargingCycles?: number;
+  fastChargingPercentage?: number; // 0-100
+  regularlyChargedAbove90Percent?: boolean;
+  regularlyDischargedBelow10Percent?: boolean;
+  operatingInHighTemperatures?: boolean;
+}): {
+  estimatedCapacityRemaining: number; // percentage of original capacity
+  estimatedRangeImpact: number; // percentage of range reduction
+  recommendations: string[];
+} {
+  // Base degradation from age (about 2-3% per year for typical batteries)
+  const ageDegradation = Math.min(batteryAgeYears * 2.5, 20);
+
+  // Degradation from charging cycles (typically 10% after 1500 cycles)
+  const cycleDegradation = Math.min((chargingCycles / 1500) * 10, 30);
+
+  // Fast charging impact (additional degradation from DC fast charging)
+  const fastChargingDegradation = (fastChargingPercentage / 100) * 5;
+
+  // High state of charge impact
+  const highSocDegradation = regularlyChargedAbove90Percent ? 5 : 0;
+
+  // Low state of charge impact
+  const lowSocDegradation = regularlyDischargedBelow10Percent ? 5 : 0;
+
+  // Temperature impact
+  const tempDegradation = operatingInHighTemperatures ? 7 : 0;
+
+  // Calculate total degradation (capped at 40% as batteries rarely degrade beyond this without replacement)
+  const totalDegradation = Math.min(
+    ageDegradation +
+      cycleDegradation +
+      fastChargingDegradation +
+      highSocDegradation +
+      lowSocDegradation +
+      tempDegradation,
+    40
+  );
+
+  // Generate recommendations
+  const recommendations: string[] = [];
+
+  if (fastChargingPercentage > 30) {
+    recommendations.push('Consider reducing DC fast charging frequency to minimize battery degradation');
+  }
+
+  if (regularlyChargedAbove90Percent) {
+    recommendations.push('Try to limit regular charging to 80-90% to extend battery lifespan');
+  }
+
+  if (regularlyDischargedBelow10Percent) {
+    recommendations.push('Avoid frequently running the battery below 10% to preserve capacity');
+  }
+
+  if (operatingInHighTemperatures) {
+    recommendations.push('When possible, park in shade and avoid charging in extreme heat');
+  }
+
+  return {
+    estimatedCapacityRemaining: 100 - totalDegradation,
+    estimatedRangeImpact: totalDegradation,
+    recommendations
+  };
+}
+
+/**
+ * Calculates the effective range of an EV with more factors taken into account
+ */
+export function calculateAdvancedRange({
+  batteryKwh,
+  consumptionKwhPer100km,
+  usableFraction = 0.9,
+  temperatureC = 20,
+  useClimateControl = false,
+  terrainType = 'flat',
+  drivingSpeed = 'moderate',
+  batteryAgeYears = 0
+}: {
+  batteryKwh: number;
+  consumptionKwhPer100km: number;
+  usableFraction?: number;
+  temperatureC?: number;
+  useClimateControl?: boolean;
+  terrainType?: 'flat' | 'hilly' | 'mountainous';
+  drivingSpeed?: 'slow' | 'moderate' | 'fast';
+  batteryAgeYears?: number;
+}): {
+  effectiveRangeKm: number;
+  adjustedConsumption: number;
+  rangeImpactFactors: {
+    temperature: number;
+    climate: number;
+    terrain: number;
+    speed: number;
+    degradation: number;
+  };
+} {
+  // Base consumption
+  let adjustedConsumption = consumptionKwhPer100km;
+
+  // Temperature impact on consumption
+  let temperatureMultiplier = 1.0;
+  if (temperatureC < -10) {
+    temperatureMultiplier = 1.4; // 40% more consumption in extreme cold
+  } else if (temperatureC < 0) {
+    temperatureMultiplier = 1.25; // 25% more consumption in cold
+  } else if (temperatureC < 10) {
+    temperatureMultiplier = 1.1; // 10% more consumption in cool weather
+  }
+
+  // Climate control impact
+  const climateControlMultiplier = useClimateControl ? (temperatureC < 10 || temperatureC > 30 ? 1.15 : 1.05) : 1.0;
+
+  // Terrain impact
+  let terrainMultiplier = 1.0;
+  switch (terrainType) {
+    case 'hilly':
+      terrainMultiplier = 1.1; // 10% more consumption
+      break;
+    case 'mountainous':
+      terrainMultiplier = 1.25; // 25% more consumption
+      break;
+  }
+
+  // Speed impact
+  let speedMultiplier = 1.0;
+  switch (drivingSpeed) {
+    case 'slow':
+      speedMultiplier = 0.9; // 10% less consumption
+      break;
+    case 'fast':
+      speedMultiplier = 1.2; // 20% more consumption
+      break;
+  }
+
+  // Battery degradation impact
+  // Simplified model: 2.5% degradation per year of battery age
+  let degradationMultiplier = 1.0;
+  if (batteryAgeYears > 0) {
+    // Calculate remaining capacity percentage (100% - degradation)
+    const remainingCapacity = 100 - Math.min(batteryAgeYears * 2.5, 30);
+    degradationMultiplier = remainingCapacity / 100;
+  }
+
+  // Apply all multipliers to consumption
+  adjustedConsumption =
+    consumptionKwhPer100km * temperatureMultiplier * climateControlMultiplier * terrainMultiplier * speedMultiplier;
+
+  // Calculate range with adjusted consumption and degradation
+  const effectiveRangeKm = ((batteryKwh * usableFraction * degradationMultiplier) / adjustedConsumption) * 100;
+
+  return {
+    effectiveRangeKm: Number(effectiveRangeKm.toFixed(2)),
+    adjustedConsumption: Number(adjustedConsumption.toFixed(2)),
+    rangeImpactFactors: {
+      temperature: Number((temperatureMultiplier - 1) * 100),
+      climate: Number((climateControlMultiplier - 1) * 100),
+      terrain: Number((terrainMultiplier - 1) * 100),
+      speed: Number((speedMultiplier - 1) * 100),
+      degradation: Number((1 - degradationMultiplier) * 100)
+    }
+  };
+}
+
+/**
+ * Calculates charging costs based on electricity rates and time-of-use
+ */
+export function calculateChargingCost({
+  energyNeededKwh,
+  baseElectricityRate,
+  useTimeOfUseRates = false,
+  offPeakRate,
+  peakRate,
+  chargingDuringOffPeak = 0, // percentage of charging done during off-peak (0-100)
+  includeFees = true,
+  fixedFee = 0,
+  taxRate = 0
+}: {
+  energyNeededKwh: number;
+  baseElectricityRate: number; // cost per kWh
+  useTimeOfUseRates?: boolean;
+  offPeakRate?: number;
+  peakRate?: number;
+  chargingDuringOffPeak?: number; // percentage
+  includeFees?: boolean;
+  fixedFee?: number;
+  taxRate?: number; // percentage
+}): {
+  totalCost: number;
+  costPerKwh: number;
+  breakdown: {
+    energyCost: number;
+    fees: number;
+    taxes: number;
+  };
+} {
+  // Calculate base energy cost
+  let energyCost = 0;
+
+  if (useTimeOfUseRates && offPeakRate !== undefined && peakRate !== undefined) {
+    // Calculate with time-of-use rates
+    const offPeakPercentage = chargingDuringOffPeak / 100;
+    const peakPercentage = 1 - offPeakPercentage;
+
+    const offPeakEnergy = energyNeededKwh * offPeakPercentage;
+    const peakEnergy = energyNeededKwh * peakPercentage;
+
+    energyCost = offPeakEnergy * offPeakRate + peakEnergy * peakRate;
+  } else {
+    // Calculate with flat rate
+    energyCost = energyNeededKwh * baseElectricityRate;
+  }
+
+  // Add fixed fees if included
+  const fees = includeFees ? fixedFee : 0;
+
+  // Calculate taxes
+  const taxes = (energyCost + fees) * (taxRate / 100);
+
+  // Calculate total cost
+  const totalCost = energyCost + fees + taxes;
+
+  // Calculate effective cost per kWh
+  const costPerKwh = totalCost / energyNeededKwh;
+
+  return {
+    totalCost: Number(totalCost.toFixed(2)),
+    costPerKwh: Number(costPerKwh.toFixed(4)),
+    breakdown: {
+      energyCost: Number(energyCost.toFixed(2)),
+      fees: Number(fees.toFixed(2)),
+      taxes: Number(taxes.toFixed(2))
+    }
+  };
+}
+
+/**
+ * Generate stats data for the cost calculator UI
+ */
+export function generateCostStats(params: {
+  costPerCharge: number;
+  weeklyCost: number;
+  monthlyCost: number;
+  annualCost: number;
+  energyPerCharge: number;
+  currency: string;
+  chargeProvider?: string;
+}): Array<{
+  title: string;
+  value: number | string;
+  unit?: string;
+  description?: string;
+  color?: 'primary' | 'secondary' | 'accent' | 'info' | 'success' | 'warning' | 'error';
+}> {
+  const { costPerCharge, weeklyCost, monthlyCost, annualCost, energyPerCharge, currency, chargeProvider } = params;
+
+  return [
+    {
+      title: 'Cost Per Charge',
+      value: costPerCharge.toFixed(2),
+      unit: currency,
+      description: `Estimated cost for a single charging session${chargeProvider ? ` with ${chargeProvider}` : ''}`,
+      color: 'accent'
+    },
+    {
+      title: 'Weekly Cost',
+      value: weeklyCost.toFixed(2),
+      unit: currency,
+      description: 'Projected weekly charging expenses',
+      color: 'primary'
+    },
+    {
+      title: 'Monthly Cost',
+      value: monthlyCost.toFixed(2),
+      unit: currency,
+      description: 'Projected monthly charging expenses',
+      color: 'info'
+    },
+    {
+      title: 'Annual Cost',
+      value: annualCost.toFixed(2),
+      unit: currency,
+      description: 'Projected annual charging expenses',
+      color: 'success'
+    },
+    {
+      title: 'Energy Per Charge',
+      value: energyPerCharge.toFixed(2),
+      unit: 'kWh',
+      description: 'Energy consumed per charging session including efficiency losses',
+      color: 'warning'
+    }
+  ];
+}

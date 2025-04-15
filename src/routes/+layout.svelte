@@ -5,7 +5,7 @@
   import Footer from '$lib/components/layout/Footer.svelte';
   import { page } from '$app/stores';
   import Analytics from '$lib/components/util/Analytics.svelte';
-  import { CookieBanner } from '$lib/components/ui';
+  import CookieBanner from '$lib/components/ui/CookieBanner.svelte';
   import { settingsStore } from '$lib/state/SettingsStore';
   import type { LayoutData } from './$types';
 

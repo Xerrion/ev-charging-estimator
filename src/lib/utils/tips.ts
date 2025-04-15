@@ -9,6 +9,7 @@ export const commonTips = {
 // Charging Time Calculator Tips
 export function getChargingTimeTips(params: {
   batteryKwh: number;
+  initialCharge: number;
   targetCharge: number;
   chargingPower: number;
   chargingEfficiency: number;
@@ -21,6 +22,7 @@ export function getChargingTimeTips(params: {
 }): string[] {
   const {
     batteryKwh,
+    initialCharge,
     targetCharge,
     chargingPower,
     chargingEfficiency,
@@ -71,6 +73,15 @@ export function getChargingTimeTips(params: {
     tips.push('Consider limiting regular charges to 80-90% for longer battery life');
   } else if (targetCharge < 50) {
     tips.push('Frequent shallow charging cycles are optimal for battery health');
+  }
+
+  // Tips based on charge range
+  const chargeRange = targetCharge - initialCharge;
+  if (chargeRange > 70) {
+    tips.push('Full charging cycles from low to high are more stressful on the battery');
+    tips.push('Consider more frequent partial charges when possible');
+  } else if (chargeRange < 20 && initialCharge > 50) {
+    tips.push('Small top-ups at higher charge levels are efficient for daily use');
   }
 
   // Tips based on efficiency
