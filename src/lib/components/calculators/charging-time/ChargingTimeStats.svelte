@@ -88,6 +88,8 @@
 </script>
 
 <Card {title}>
+  <Stats {stats} />
+
   {#if results.technicalLimitExceeded}
     <Alert
       type="warning"
@@ -114,6 +116,4 @@
   {#if results.limitingFactor === 'connector'}
     <Alert type="info" message="Charging is limited by the DC connector's maximum power rating." />
   {/if}
-
-  <Stats {stats} />
 </Card>
