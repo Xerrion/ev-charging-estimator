@@ -356,7 +356,7 @@ export function getWeeklyChargesDescription({
   safetyChargeAdded: boolean;
 }): string {
   if (safetyChargeAdded) return '✓ Safety margin included';
-  if (charges <= 1) return 'Less than once per week';
+  if (charges <= 1) return 'Safe to charge once per week';
   if (charges > 3) return 'Frequent charging needed';
   return 'Normal charging frequency';
 }
@@ -432,13 +432,13 @@ export function generateFrequencyStats({
       color: 'primary'
     },
     {
-      title: safetyChargeAdded ? 'Weekly Charges (Safe)' : 'Weekly Charges',
+      title: safetyChargeAdded ? 'Weekly Charges (Safety Charge Added)' : 'Weekly Charges',
       value: weeklyCharges,
       description: getWeeklyChargesDescription({
         charges: weeklyCharges,
         safetyChargeAdded
       }),
-      color: safetyChargeAdded ? 'warning' : 'secondary'
+      color: safetyChargeAdded ? 'accent' : 'secondary'
     },
     {
       title: 'CO₂ Savings',
@@ -449,21 +449,6 @@ export function generateFrequencyStats({
     }
   ];
 }
-
-export const REGIONAL_EMISSIONS = {
-  EUROPE: {
-    gasolineEmissionsGramPerKm: 120,
-    electricityEmissionsGramPerKm: 40
-  },
-  USA: {
-    gasolineEmissionsGramPerKm: 130,
-    electricityEmissionsGramPerKm: 70
-  },
-  CHINA: {
-    gasolineEmissionsGramPerKm: 125,
-    electricityEmissionsGramPerKm: 90
-  }
-};
 
 /**
  * Estimates battery degradation based on charging characteristics and cycles

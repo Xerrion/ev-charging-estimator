@@ -4,6 +4,7 @@
   import warningIcon from '$lib/assets/icons/warning.svg?raw';
   import errorIcon from '$lib/assets/icons/error.svg?raw';
   import xIcon from '$lib/assets/icons/x.svg?raw';
+  import { fade } from 'svelte/transition';
 
   type AlertType = 'info' | 'success' | 'warning' | 'error';
   type AlertStyle = 'default' | 'soft' | 'outline';
@@ -64,7 +65,7 @@
 </script>
 
 {#if visible}
-  <div role="alert" class="alert alert-{type} {styleClass()} {className}">
+  <div role="alert" class="alert alert-{type} {styleClass()} {className}" transition:fade={{ duration: 200 }}>
     {@html icon}
     <span>{message}</span>
     {#if dismissible}

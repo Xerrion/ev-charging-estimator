@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { generateFrequencyStats, isSafetyChargeAdded } from '$lib/utils/calculations';
-  import Stats from '$lib/components/ui/Stats.svelte';
-  import Card from '$lib/components/ui/Card.svelte';
   import Alert from '$lib/components/ui/Alert.svelte';
+  import Card from '$lib/components/ui/Card.svelte';
+  import Stats from '$lib/components/ui/Stats.svelte';
+  import { generateFrequencyStats, isSafetyChargeAdded } from '$lib/utils/calculations';
 
   type Result = {
     effectiveRangeKm: number;
@@ -54,6 +54,7 @@
 </script>
 
 <Card {title}>
+  <Stats {stats} />
   {#if safetyChargeAdded}
     <Alert
       type="warning"
@@ -61,5 +62,4 @@
       className="mb-4"
     />
   {/if}
-  <Stats {stats} />
 </Card>

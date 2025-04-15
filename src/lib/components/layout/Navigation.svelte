@@ -17,7 +17,7 @@
   ];
 </script>
 
-<div class="navbar-center flex-grow">
+<div class="navbar-center order-first flex-grow">
   <!-- Mobile menu -->
   <div class="dropdown lg:hidden">
     <button class="btn btn-ghost" aria-label="Open menu">
