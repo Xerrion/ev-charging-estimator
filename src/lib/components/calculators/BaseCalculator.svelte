@@ -8,6 +8,50 @@
   import Alert from '$lib/components/ui/Alert.svelte';
   import Tips from '$lib/components/ui/Tips.svelte';
   import { formatValue } from '$lib/utils/formatters';
+  import { cubicOut } from 'svelte/easing';
+  import { fade } from 'svelte/transition';
+
+  /**
+   * Custom slide and fade transition for alerts
+   * @param node The HTML element to animate
+   * @param params Animation parameters
+   */
+  function alertTransition(node: HTMLElement, { delay = 0, duration = 400 } = {}) {
+    return {
+      delay,
+      duration,
+      css: (t: number, u: number) => {
+        const eased = cubicOut(t);
+        return `
+          transform: translateY(${u * -20}px);
+          opacity: ${eased};
+          height: ${eased * 100}%;
+          padding-top: ${eased * 1}rem;
+          padding-bottom: ${eased * 1}rem;
+        `;
+      }
+    };
+  }
+
+  /**
+   * Custom scale transition for calculator content
+   * @param node The HTML element to animate
+   * @param params Animation parameters
+   */
+  function scaleTransition(node: HTMLElement, { delay = 150, duration = 300 } = {}) {
+    return {
+      delay,
+      duration,
+      css: (t: number, u: number) => {
+        const eased = cubicOut(t);
+        return `
+          transform-origin: center top;
+          transform: scale(${eased});
+          opacity: ${eased};
+        `;
+      }
+    };
+  }
 
   // Configurable props
   let {
@@ -178,16 +222,24 @@
 </script>
 
 {#if error}
-  <Alert type="error" message={error} />
+  <div transition:alertTransition>
+    <Alert type="error" message={error} />
+  </div>
 {/if}
 
 {#if isLoading}
-  <TipsSkeleton />
-  <ParameterFormSkeleton rows={inputFields.length} />
-  <StatsSkeleton columns={3} />
+  <div transition:fade={{ duration: 200 }}>
+    <TipsSkeleton />
+    <ParameterFormSkeleton rows={inputFields.length} />
+    <StatsSkeleton columns={3} />
+  </div>
 {:else}
-  <Tips title="Tips" {tips} color="success" />
+  <div transition:alertTransition>
+    <Tips title="Tips" {tips} color="success" />
+  </div>
   {@render children?.()}
-  <ParameterForm {title} {inputs} />
-  <StatsComponent {results} {formData} title="Results" />
+  <div transition:scaleTransition>
+    <ParameterForm {title} {inputs} />
+    <StatsComponent {results} {formData} title="Results" />
+  </div>
 {/if}
