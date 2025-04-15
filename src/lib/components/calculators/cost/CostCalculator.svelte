@@ -9,12 +9,14 @@
 
 <div class="w-full">
 	<div class="prose">
-		<h3>Coming Soon</h3>
-		<p>
+		<h2>Coming Soon</h2>
+		<p class="text-base-content/70 mt-2">
 			The EV Charging Cost Calculator will help you estimate how much it costs to charge your
 			electric vehicle based on electricity rates and charging habits.
 		</p>
-		<p>This feature is currently under development and will be available soon.</p>
+		<p class="text-base-content/70">
+			This feature is currently under development and will be available soon.
+		</p>
 	</div>
 
 	<div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">

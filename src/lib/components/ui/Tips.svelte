@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Card from './Card.svelte';
+
 	let {
 		title = 'Recommended Tips',
 		tips = [],
@@ -12,11 +14,15 @@
 	}>();
 </script>
 
-<div class="rounded-box p-6 shadow bg-{color}-content {className}">
-	<h3 class="mb-3 text-lg font-semibold">{title}</h3>
-	<ul class="list-disc space-y-2 pl-5">
-		{#each tips as tip}
-			<li>{tip}</li>
-		{/each}
-	</ul>
-</div>
+<Card {className}>
+	<svelte:fragment>
+		<div class="bg-{color}-content/10 -m-4 mb-2 rounded-t-lg p-4">
+			<h3 class="text-lg font-semibold text-{color}">{title}</h3>
+		</div>
+		<ul class="list-disc space-y-2 pl-5">
+			{#each tips as tip}
+				<li>{tip}</li>
+			{/each}
+		</ul>
+	</svelte:fragment>
+</Card>

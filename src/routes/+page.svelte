@@ -4,7 +4,7 @@
 </script>
 
 <CalculatorLayout
-	title="EV Charge Frequency Calculator"
+	title="Charge Frequency Calculator"
 	description="Calculate how many times you'll need to charge your electric vehicle per week based on your
 		driving habits and vehicle specifications."
 	calculator={() => EVCalculator}

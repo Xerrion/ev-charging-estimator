@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { Alert } from '$lib/components/ui';
 </script>
 
 <svelte:head>
@@ -60,26 +61,11 @@
 			<li>Visit duration</li>
 		</ul>
 
-		<div class="alert alert-info text-sm shadow-sm">
-			<div>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					class="h-6 w-6 flex-shrink-0 stroke-current"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-					></path></svg
-				>
-				<span
-					>All data is anonymized. We cannot identify individual users or track them across
-					different websites.</span
-				>
-			</div>
-		</div>
+		<Alert
+			type="info"
+			message="All data is anonymized. We cannot identify individual users or track them across different websites."
+			className="text-sm shadow-sm mb-4"
+		/>
 	</section>
 
 	<section class="mb-8">
@@ -108,6 +94,11 @@
 						<td>Remember your most recent calculation values</td>
 						<td>Persistent</td>
 					</tr>
+					<tr>
+						<td>Cookie consent</td>
+						<td>Remember that you've seen our cookie notice</td>
+						<td>365 days</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>
@@ -134,7 +125,7 @@
 		<h2 class="text-base-content mb-3 text-2xl font-semibold">Contact Information</h2>
 		<p class="text-base-content/80">
 			If you have questions about this privacy policy or our data practices, please contact us at:
-			<a href="mailto:privacy@example.com" class="link link-primary">privacy@example.com</a>
+			<a href="/contact" class="link link-primary">our contact page</a>.
 		</p>
 	</section>
 

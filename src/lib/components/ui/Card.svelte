@@ -10,7 +10,7 @@
 	}>();
 </script>
 
-<div class="card bg-base-100 shadow-md {className}">
+<div class="card card-border bg-base-100 {className}">
 	{#if title}
 		<div class="card-title p-6 pb-2 text-lg font-semibold">{title}</div>
 	{/if}

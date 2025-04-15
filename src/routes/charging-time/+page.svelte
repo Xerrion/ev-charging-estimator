@@ -4,7 +4,7 @@
 </script>
 
 <CalculatorLayout
-	title="EV Charging Time Calculator"
+	title="Charging Time Calculator"
 	description="Calculate how long it will take to charge your electric vehicle from the initial charge level to your target level."
 	calculator={() => ChargingTimeCalculator}
 	explanation={() => {

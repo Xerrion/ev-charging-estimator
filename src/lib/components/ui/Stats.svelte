@@ -1,6 +1,6 @@
 <script lang="ts">
 	import StatsGroup from './StatsGroup.svelte';
-	import StatCard from './StatCard.svelte';
+	import Stat from './Stat.svelte';
 
 	let { stats } = $props<{
 		stats: Array<{
@@ -16,7 +16,7 @@
 <StatsGroup>
 	{#snippet children()}
 		{#each stats as stat}
-			<StatCard
+			<Stat
 				title={stat.title}
 				value={stat.value}
 				unit={stat.unit || ''}

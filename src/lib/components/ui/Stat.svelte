@@ -22,10 +22,12 @@
 	}
 </script>
 
-<div class="stat place-items-center">
+<div class="stat">
 	<div class="stat-title">{title}</div>
 	<div class="stat-value text-{color}">
 		{formatValue(value)}{value ? unit : ''}
 	</div>
-	<div class="stat-desc">{description}</div>
+	{#if description}
+		<div class="stat-desc">{description}</div>
+	{/if}
 </div>

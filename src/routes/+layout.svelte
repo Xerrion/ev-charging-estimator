@@ -5,6 +5,7 @@
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import { page } from '$app/state';
 	import Analytics from '$lib/components/util/Analytics.svelte';
+	import { CookieBanner } from '$lib/components/ui';
 
 	let { children } = $props();
 
@@ -67,11 +68,19 @@
 <Analytics />
 
 <div class="flex min-h-screen flex-col transition-colors">
-	<header class="bg-base-100 border-base-300 border-b px-7 shadow-sm">
-		<div class="container-custom flex items-center justify-between py-4">
-			<h1 class="text-primary text-xl font-bold">EV Estimator Hub</h1>
-			<Navigation />
-			<ThemeSwitcher />
+	<header class="bg-base-100 border-base-300 border-b shadow-sm">
+		<div class="container-custom">
+			<div class="navbar">
+				<div class="navbar-start">
+					<a href="/" class="btn btn-ghost text-primary text-xl font-bold">EV Estimator Hub</a>
+				</div>
+
+				<Navigation />
+
+				<div class="navbar-end">
+					<ThemeSwitcher />
+				</div>
+			</div>
 		</div>
 	</header>
 
@@ -82,4 +91,7 @@
 	</main>
 
 	<Footer />
+
+	<!-- Cookie banner -->
+	<CookieBanner />
 </div>

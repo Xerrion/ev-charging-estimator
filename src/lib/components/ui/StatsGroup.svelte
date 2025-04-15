@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Card from './Card.svelte';
+
 	let {
 		className = '',
 		vertical = false,
@@ -10,10 +12,10 @@
 	}>();
 </script>
 
-<div
-	class="stats w-full shadow {vertical
-		? 'stats-vertical'
-		: ''} grid-flow-row lg:grid-flow-col {className}"
->
-	{@render children?.()}
-</div>
+<Card {className}>
+	<svelte:fragment>
+		<div class="stats w-full {vertical ? 'stats-vertical' : ''} grid-flow-row lg:grid-flow-col">
+			{@render children?.()}
+		</div>
+	</svelte:fragment>
+</Card>
