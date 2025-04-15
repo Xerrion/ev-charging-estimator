@@ -15,8 +15,8 @@
     // Only enable in production by default, or if explicitly enabled in development
     enabled: isProd || (enableInDev && !isProd),
     provider: 'umami', // Options: 'umami', 'plausible', 'ga4', 'none'
-    websiteId: import.meta.env.VITE_ANALYTICS_ID || 'your-website-id',
-    scriptUrl: import.meta.env.VITE_ANALYTICS_URL || 'https://analytics.yourdomain.com/script.js'
+    websiteId: import.meta.env.VITE_ANALYTICS_ID || 'e9fd084e-324d-4758-abc7-048d4392ea9c',
+    scriptUrl: import.meta.env.VITE_ANALYTICS_URL || 'https://cloud.umami.is/script.js'
   };
 
   // Debug output in development
