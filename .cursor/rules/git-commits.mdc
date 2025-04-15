@@ -32,6 +32,8 @@ More Examples:
 - `test`: (adding missing tests, refactoring tests; no production code change)
 - `chore`: (updating grunt tasks etc; no production code change)
 
+Always remember to commit your changes
+
 References:
 
 - https://www.conventionalcommits.org/
