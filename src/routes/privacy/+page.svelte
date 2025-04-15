@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import { Alert } from '$lib/components/ui';
+  import Alert from '$lib/components/ui/Alert.svelte';
 </script>
 
 <svelte:head>
