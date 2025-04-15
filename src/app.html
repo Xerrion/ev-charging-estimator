@@ -8,44 +8,9 @@
       name="description"
       content="EV Charge Frequency Estimator - Calculate how many times you need to charge your electric vehicle per week"
     />
-    <script>
-      // Theme detection script - runs before page loads to prevent theme flicker
-      (function () {
-        try {
-          const storedData = localStorage.getItem('options');
-          if (storedData) {
-            const data = JSON.parse(storedData);
-            if (data && data.theme && (data.theme === 'light' || data.theme === 'dark')) {
-              // Set initial theme at the HTML level to avoid flash of wrong theme
-              document.documentElement.setAttribute('data-preloaded-theme', data.theme);
-
-              // This will be applied by document.body once DOM is ready
-              // But we set a backup in case of any issues
-              setTimeout(function () {
-                if (document.body) {
-                  document.body.setAttribute('data-theme', data.theme);
-                }
-              }, 0);
-            }
-          }
-        } catch (e) {
-          console.error('Theme loading error:', e);
-          // Fail silently for users
-        }
-      })();
-    </script>
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover" data-theme="light">
     <div style="display: contents">%sveltekit.body%</div>
-    <script>
-      // Ensure the theme from localStorage is properly set once the DOM is loaded
-      document.addEventListener('DOMContentLoaded', function () {
-        const preloadedTheme = document.documentElement.getAttribute('data-preloaded-theme');
-        if (preloadedTheme) {
-          document.body.setAttribute('data-theme', preloadedTheme);
-        }
-      });
-    </script>
   </body>
 </html>
