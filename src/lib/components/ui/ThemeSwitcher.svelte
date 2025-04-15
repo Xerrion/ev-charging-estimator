@@ -70,6 +70,7 @@
 </script>
 
 <svelte:head>
+  <script>
     // Check localStorage for theme preference and apply immediately to prevent flicker
     try {
       const storedData = localStorage.getItem('ev-calculator-data');
@@ -104,6 +105,7 @@
     } catch (error) {
       console.error('Failed to apply theme from localStorage:', error);
     }
+  </script>
 </svelte:head>
 
 <label class="flex cursor-pointer gap-2">
