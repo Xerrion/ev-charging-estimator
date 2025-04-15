@@ -1,23 +1,24 @@
-import { getData, saveData } from '$lib/utils/storage';
-import { writable } from 'svelte/store';
+import { derived, get } from 'svelte/store';
+import { settingsStore } from './SettingsStore';
 
-// Create a writable store with the initial battery capacity
-const batteryCapacityStore = writable(getData().batteryKwh);
+/**
+ * @deprecated Use evSettings.batteryCapacity instead
+ * This is kept for backwards compatibility.
+ */
+export const batteryCapacityStore = derived(settingsStore, ($settings) => $settings.batteryKwh);
 
-// Update function that also saves to storage
-function updateBatteryCapacity(value: number) {
-	batteryCapacityStore.set(value);
-	saveData({ batteryKwh: value });
+/**
+ * @deprecated Use evSettings.update({batteryKwh: value}) instead
+ * This is kept for backwards compatibility.
+ */
+export function updateBatteryCapacity(value: number): void {
+  settingsStore.update({ batteryKwh: value });
 }
 
-// Export a getter to ensure the latest value is always retrieved
-function getBatteryCapacity() {
-	let currentValue: number;
-	batteryCapacityStore.subscribe((value) => {
-		currentValue = value;
-	})();
-	return currentValue!;
+/**
+ * @deprecated Use get(evSettings).batteryKwh instead
+ * This is kept for backwards compatibility.
+ */
+export function getBatteryCapacity(): number {
+  return get(settingsStore).batteryKwh;
 }
-
-// Export the store directly for subscription in components
-export { batteryCapacityStore, getBatteryCapacity, updateBatteryCapacity };

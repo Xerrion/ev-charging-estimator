@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import CalculatorLayout from '$lib/components/layout/CalculatorLayout.svelte';
   import CostCalculator from '$lib/components/calculators/cost/CostCalculator.svelte';
 </script>

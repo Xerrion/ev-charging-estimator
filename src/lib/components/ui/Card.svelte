@@ -6,7 +6,7 @@
   } = $props<{
     title?: string;
     className?: string;
-    children?: any;
+    children?: () => unknown;
   }>();
 </script>
 

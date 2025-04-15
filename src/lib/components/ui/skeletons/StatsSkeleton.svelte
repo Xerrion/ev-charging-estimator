@@ -6,7 +6,7 @@
   }>();
 </script>
 
-<StatsGroup className="py-3">
+<StatsGroup>
   {#snippet children()}
     {#each Array(columns) as _}
       <div class="flex flex-col items-center gap-2">

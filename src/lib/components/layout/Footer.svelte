@@ -27,7 +27,7 @@
     </div>
   </nav>
   <aside>
-    <p>© {currentYear} EV Estimator Hub. All rights reserved.</p>
+    <p>&copyleft; {currentYear} EV Estimator Hub. All rights reserved.</p>
     <p class="mt-1 text-xs opacity-75">Built with Love, AI & Svelte. No cookies. No tracking. No nonsense.</p>
   </aside>
 </footer>

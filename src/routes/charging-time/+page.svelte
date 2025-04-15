@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import CalculatorLayout from '$lib/components/layout/CalculatorLayout.svelte';
   import ChargingTimeCalculator from '$lib/components/calculators/charging-time/ChargingTimeCalculator.svelte';
 </script>

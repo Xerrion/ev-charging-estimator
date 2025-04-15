@@ -1,13 +1,17 @@
 <script lang="ts">
   import CalculatorLayout from '$lib/components/layout/CalculatorLayout.svelte';
-  import EVCalculator from '$lib/components/calculators/frequency/EVCalculator.svelte';
+  import FrequencyCalculator from '$lib/components/calculators/frequency/FrequencyCalculator.svelte';
+  import type { PageData } from './$types';
+
+  // Get data from the load function
+  let { data } = $props<{ data: PageData }>();
 </script>
 
 <CalculatorLayout
   title="Charge Frequency Calculator"
   description="Calculate how many times you'll need to charge your electric vehicle per week based on your
 		driving habits and vehicle specifications."
-  calculator={() => EVCalculator}
+  calculator={() => FrequencyCalculator}
   explanation={() => {
     return `
 			<h2 class="text-base-content mb-4 text-xl font-semibold">How it works</h2>

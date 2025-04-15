@@ -3,11 +3,29 @@
   import ThemeSwitcher from '$lib/components/ui/ThemeSwitcher.svelte';
   import Navigation from '$lib/components/layout/Navigation.svelte';
   import Footer from '$lib/components/layout/Footer.svelte';
-  import { page } from '$app/state';
+  import { page } from '$app/stores';
   import Analytics from '$lib/components/util/Analytics.svelte';
   import { CookieBanner } from '$lib/components/ui';
+  import { settingsStore } from '$lib/state/SettingsStore';
+  import type { LayoutData } from './$types';
 
-  let { children } = $props();
+  let { children, data } = $props<{
+    children: any;
+    data: LayoutData;
+  }>();
+
+  // Apply theme from the layout data
+  $effect(() => {
+    if (data.theme) {
+      // Update store to keep it in sync
+      settingsStore.update({ theme: data.theme as 'light' | 'dark' });
+
+      // Set theme on body
+      if (typeof document !== 'undefined') {
+        document.body.setAttribute('data-theme', data.theme);
+      }
+    }
+  });
 
   // Default SEO data
   const defaultSeo = {
@@ -20,17 +38,17 @@
 
   // Page-specific SEO data based on route
   $effect(() => {
-    const path = page.url.pathname;
+    const pathname = $page.url.pathname;
 
     // Update page title based on the current route
-    if (path === '/') {
+    if (pathname === '/') {
       seoData.title = 'EV Charge Frequency Calculator | EV Estimator Hub';
       seoData.description =
         'Calculate how many times you need to charge your electric vehicle per week based on your driving habits';
-    } else if (path === '/charging-time') {
+    } else if (pathname === '/charging-time') {
       seoData.title = 'EV Charging Time Calculator | EV Estimator Hub';
       seoData.description = 'Calculate how long it will take to charge your electric vehicle from any state of charge';
-    } else if (path === '/cost') {
+    } else if (pathname === '/cost') {
       seoData.title = 'EV Charging Cost Calculator | EV Estimator Hub';
       seoData.description = 'Calculate the cost of charging your electric vehicle at home or at public stations';
     }
@@ -46,7 +64,7 @@
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content={seoData.type} />
-  <meta property="og:url" content={page.url.href} />
+  <meta property="og:url" content={$page.url.href} />
   <meta property="og:title" content={seoData.title} />
   <meta property="og:description" content={seoData.description} />
   <meta property="og:image" content={seoData.image} />
@@ -58,7 +76,7 @@
   <meta name="twitter:image" content={seoData.image} />
 
   <!-- Canonical URL -->
-  <link rel="canonical" href={page.url.href} />
+  <link rel="canonical" href={$page.url.href} />
 </svelte:head>
 
 <!-- Include Analytics component (doesn't render anything visible) -->
@@ -75,7 +93,7 @@
         <Navigation />
 
         <div class="navbar-end">
-          <ThemeSwitcher />
+          <ThemeSwitcher currentTheme={data.theme as 'light' | 'dark'} />
         </div>
       </div>
     </div>

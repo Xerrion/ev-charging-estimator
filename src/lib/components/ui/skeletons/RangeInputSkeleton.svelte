@@ -1,4 +1,4 @@
-<div class="mb-6">
+<div class="mb-5">
   <div class="mb-3 flex items-center justify-between">
     <!-- Parameter name / Label -->
     <div class="skeleton h-5 w-36"></div>

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import successIcon from '$lib/assets/icons/success.svg';
   import infoIcon from '$lib/assets/icons/info.svg';
   import warningIcon from '$lib/assets/icons/warning.svg';
