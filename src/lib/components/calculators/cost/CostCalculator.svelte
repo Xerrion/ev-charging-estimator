@@ -148,6 +148,15 @@
     return rateType === 'flat' ? [...baseInputFields, ...flatRateFields] : [...baseInputFields, ...variableRateFields];
   });
 
+  // Current input fields (non-derived for passing to component)
+  let currentFields = $state<typeof baseInputFields>([]);
+
+  // Update fields when rate type changes
+  $effect(() => {
+    currentFields =
+      rateType === 'flat' ? [...baseInputFields, ...flatRateFields] : [...baseInputFields, ...variableRateFields];
+  });
+
   // Calculate function
   function calculateResults(formData: Record<string, number>) {
     // Calculate energy needed for a single charge
@@ -223,7 +232,7 @@
     settingsStore.update({ selectedCurrency });
   }
 </script>
-
+<div class="flex flex-col gap-4">
 <!-- Rate Type Selection -->
 <Card title="Rate Selection">
   <div class="flex flex-wrap gap-4">
@@ -278,7 +287,7 @@
 
 <BaseCalculator
   title="Cost Parameters"
-  {inputFields}
+  inputFields={currentFields}
   calculateFn={calculateResults}
   statsComponent={CostStats}
   getTips={getCostTips}

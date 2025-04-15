@@ -7,7 +7,6 @@
   import TipsSkeleton from '$lib/components/ui/skeletons/TipsSkeleton.svelte';
   import Alert from '$lib/components/ui/Alert.svelte';
   import Tips from '$lib/components/ui/Tips.svelte';
-  import Card from '$lib/components/ui/Card.svelte';
   import { formatValue } from '$lib/utils/formatters';
 
   // Configurable props
@@ -60,12 +59,14 @@
       // One-time operation to get settings
       settingsStore.subscribe((settings) => {
         // Initialize form data with values from the store
-        formData = inputFields.reduce((data, field) => {
+        formData = inputFields.reduce((data: Record<string, number>, field: (typeof inputFields)[number]) => {
           // Use the storeKey if provided, otherwise use the field key
           const storeKey = field.storeKey || field.key;
 
           // Get value from settings or use default
-          const value = settings[storeKey] ?? DEFAULT_VALUES[storeKey] ?? 0;
+          const value = (settings[storeKey as keyof typeof settings] ??
+            DEFAULT_VALUES[storeKey as keyof typeof DEFAULT_VALUES] ??
+            0) as number;
 
           // Special case for percentage values stored as fractions
           if (field.unit === '%' && storeKey.includes('Fraction') && value <= 1) {
@@ -95,7 +96,7 @@
 
   // Generate input configurations for ParameterForm
   const inputs = $derived(
-    inputFields.map((field) => {
+    inputFields.map((field: (typeof inputFields)[number]) => {
       return {
         id: field.id,
         label: field.label,
