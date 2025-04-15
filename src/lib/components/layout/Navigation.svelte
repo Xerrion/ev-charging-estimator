@@ -19,9 +19,9 @@
   ];
 </script>
 
-<div class="navbar">
+<div class="navbar px-5">
   <div class="navbar-start">
-    <a href="/" class="btn btn-ghost text-primary text-xl font-bold">EV Estimator Hub</a>
+    <a href="/" class="text-primary text-xl font-bold">EV Estimator Hub</a>
   </div>
   <div class="navbar-center flex-grow">
     <!-- Mobile menu -->
