@@ -2,6 +2,7 @@
 	import '../app.css';
 	import ThemeSwitcher from '$lib/components/ui/ThemeSwitcher.svelte';
 	import Navigation from '$lib/components/layout/Navigation.svelte';
+	import Footer from '$lib/components/layout/Footer.svelte';
 	import { page } from '$app/state';
 	import Analytics from '$lib/components/util/Analytics.svelte';
 
@@ -9,7 +10,7 @@
 
 	// Default SEO data
 	const defaultSeo = {
-		title: 'EV Calculator Hub',
+		title: 'EV Estimator Hub',
 		description:
 			'Tools to calculate EV charging frequency, time and costs for electric vehicle owners',
 		type: 'website',
@@ -23,15 +24,15 @@
 
 		// Update page title based on the current route
 		if (path === '/') {
-			seoData.title = 'EV Charge Frequency Calculator | EV Calculator Hub';
+			seoData.title = 'EV Charge Frequency Calculator | EV Estimator Hub';
 			seoData.description =
 				'Calculate how many times you need to charge your electric vehicle per week based on your driving habits';
 		} else if (path === '/charging-time') {
-			seoData.title = 'EV Charging Time Calculator | EV Calculator Hub';
+			seoData.title = 'EV Charging Time Calculator | EV Estimator Hub';
 			seoData.description =
 				'Calculate how long it will take to charge your electric vehicle from any state of charge';
 		} else if (path === '/cost') {
-			seoData.title = 'EV Charging Cost Calculator | EV Calculator Hub';
+			seoData.title = 'EV Charging Cost Calculator | EV Estimator Hub';
 			seoData.description =
 				'Calculate the cost of charging your electric vehicle at home or at public stations';
 		}
@@ -68,7 +69,7 @@
 <div class="flex min-h-screen flex-col transition-colors">
 	<header class="bg-base-100 border-base-300 border-b px-7 shadow-sm">
 		<div class="container-custom flex items-center justify-between py-4">
-			<h1 class="text-primary text-xl font-bold">EV Calculator Hub</h1>
+			<h1 class="text-primary text-xl font-bold">EV Estimator Hub</h1>
 			<Navigation />
 			<ThemeSwitcher />
 		</div>
@@ -79,4 +80,6 @@
 			{@render children()}
 		</div>
 	</main>
+
+	<Footer />
 </div>
