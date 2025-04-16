@@ -16,7 +16,7 @@
   let rateType = $state<RateType>('flat');
   let selectedCurrency = $state(get(calculatorStore).currency);
   let currencyOptions = $state(getCostCurrencyOptions());
-  let currentFields = $state(getCostInputFields(rateType, selectedCurrency));
+  let currentFields = $derived(getCostInputFields(rateType, selectedCurrency));
 
   // Handle rate type change
   function handleRateTypeChange(type: RateType): void {
