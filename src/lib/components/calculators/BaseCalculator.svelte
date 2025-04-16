@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { settingsStore } from '$lib/state/SettingsStore';
-  import { DEFAULT_VALUES, INPUT_RANGES } from '$lib/utils/constants';
-
+  import { calculatorStore } from '$lib/state/CalculatorStore';
+  import type { CalculatorData, FormData, InputField, CalculatorProps, CalculatorResults } from '$lib/types';
+  import { get } from 'svelte/store';
   import { formatValue } from '$lib/utils/formatters';
   import Alert from '../ui/Alert.svelte';
   import ParameterForm from '../ui/ParameterForm.svelte';
@@ -9,6 +9,7 @@
   import StatsSkeleton from '../ui/skeletons/StatsSkeleton.svelte';
   import TipsSkeleton from '../ui/skeletons/TipsSkeleton.svelte';
   import Tips from '../ui/Tips.svelte';
+  import { DEFAULT_VALUES } from '$lib/utils/constants';
 
   // Configurable props
   let {
@@ -18,30 +19,9 @@
     statsComponent,
     getTips = () => [],
     getErrorTips = () => ['Check your input values and try again'],
-    children,
-    currency
-  } = $props<{
-    title?: string;
-    inputFields: Array<{
-      id: string;
-      label: string;
-      key: string;
-      min?: number;
-      max?: number;
-      step?: number;
-      unit?: string;
-      allowDecimals?: boolean;
-      storeKey?: string;
-      options?: Array<{ value: string; label: string }>;
-      type?: 'select' | 'range' | 'radio';
-    }>;
-    calculateFn: (formData: Record<string, number>) => Record<string, any>;
-    statsComponent: any;
-    getTips?: (data: Record<string, any>) => string[];
-    getErrorTips?: () => string[];
-    children?: () => unknown;
-    currency?: string;
-  }>();
+    children = undefined,
+    currency = undefined
+  } = $props();
 
   // Component state
   let isLoading = $state(true);
@@ -49,77 +29,101 @@
   let error = $state<string | null>(null);
 
   // Form data and results
-  let formData = $state<Record<string, number | string>>({});
-  let results = $state<Record<string, any>>({});
+  let formData = $state<FormData>({});
+  let results = $state<CalculatorResults>({});
   let tips = $state<string[]>([]);
+  let settings = $state<CalculatorData>(DEFAULT_VALUES.CALCULATOR);
 
   // Initialize with timeout for smoother UX
   $effect(() => {
     setTimeout(() => {
       initializeFromStore();
-    }, 800);
+    }, 1000);
   });
 
-  // Initialize form data from settings store
+  // Initialize form data from calculator store
   function initializeFromStore(): void {
     try {
-      // One-time operation to get settings
-      settingsStore.subscribe((settings) => {
-        // Initialize form data with values from the store
-        formData = inputFields.reduce((data: Record<string, number | string>, field: (typeof inputFields)[number]) => {
-          // Use the storeKey if provided, otherwise use the field key
-          const storeKey = field.storeKey || field.key;
+      isLoading = true;
+      settings = get(calculatorStore);
 
-          // Get value from settings or use default
-          const value = (settings[storeKey as keyof typeof settings] ??
-            DEFAULT_VALUES[storeKey as keyof typeof DEFAULT_VALUES] ??
-            0) as number;
+      formData = inputFields.reduce((acc: FormData, field: InputField) => {
+        const storeKey = field.storeKey || field.key;
+        const storedValue = settings[storeKey as keyof CalculatorData];
 
-          // Special case for percentage values stored as fractions
-          if (field.unit === '%' && storeKey.includes('Fraction') && value <= 1) {
-            data[field.key] = value * 100;
+        let value: number | string;
+
+        if (storedValue !== undefined && storedValue !== null) {
+          if (field.type === 'range' || field.type === 'number') {
+            const numValue = Number(storedValue);
+            if (!isNaN(numValue)) {
+              // Convert fraction to percentage for usable battery
+              if (field.key === 'usableFraction') {
+                value = numValue * 100;
+              } else {
+                value = numValue;
+              }
+            } else {
+              value = field.type === 'range' || field.type === 'number' ? 0 : '';
+            }
+          } else if (field.type === 'select' || field.type === 'radio') {
+            value = String(storedValue);
           } else {
-            data[field.key] = value;
+            value = storedValue;
           }
+        } else {
+          value = field.type === 'range' || field.type === 'number' ? 0 : '';
+        }
 
-          return data;
-        }, {});
+        acc[field.key] = value;
+        return acc;
+      }, {});
 
-        // Set initialized flag
-        isInitialized = true;
+      isInitialized = true;
 
-        // Calculate initial results
+      if (isFormDataValid()) {
         calculateResults();
-
-        // Set loading to false
-        isLoading = false;
-      })();
+      }
     } catch (err) {
-      console.error('Error initializing from settings:', err);
+      console.error('Error initializing form data:', err);
       error = err instanceof Error ? err.message : 'Failed to initialize';
+    } finally {
       isLoading = false;
+    }
+  }
+
+  // Update store with new value
+  function updateStore(key: keyof CalculatorData, value: number | string) {
+    // Get current store value first
+    const currentValue = get(calculatorStore)[key];
+
+    // Convert percentage to fraction for usable battery before comparing
+    if (key === 'usableFraction') {
+      const newValue = Number(value) / 100;
+      if (currentValue !== newValue) {
+        calculatorStore.updateValue(key, newValue);
+      }
+    } else if (currentValue !== value) {
+      calculatorStore.updateValue(key, value);
     }
   }
 
   // Generate input configurations for ParameterForm
   const inputs = $derived(
-    inputFields.map((field: (typeof inputFields)[number]) => {
+    inputFields.map((field: InputField) => {
       // Check if this is a select input
       if (field.type === 'select' && field.options) {
         return {
-          id: field.id,
+          id: field.key,
           label: field.label,
           options: field.options,
           type: 'select' as const,
           getValue: () => (formData[field.key] as string) || '',
           setValue: (val: string) => {
             if (formData[field.key] === val) return;
-
             formData[field.key] = val;
-
-            // Update the store
             const storeKey = field.storeKey || field.key;
-            settingsStore.update({ [storeKey]: val });
+            updateStore(storeKey as keyof CalculatorData, val);
             saveAndCalculate();
           }
         };
@@ -128,19 +132,16 @@
       // Check if this is a radio input
       if (field.type === 'radio' && field.options) {
         return {
-          id: field.id,
+          id: field.key,
           label: field.label,
           options: field.options,
           type: 'radio' as const,
           getValue: () => (formData[field.key] as string) || '',
           setValue: (val: string) => {
             if (formData[field.key] === val) return;
-
             formData[field.key] = val;
-
-            // Update the store
             const storeKey = field.storeKey || field.key;
-            settingsStore.update({ [storeKey]: val });
+            updateStore(storeKey as keyof CalculatorData, val);
             saveAndCalculate();
           }
         };
@@ -148,7 +149,7 @@
 
       // Default to range input
       return {
-        id: field.id,
+        id: field.key,
         label: field.label,
         min: field.min || 0,
         max: field.max || 100,
@@ -158,22 +159,17 @@
         type: 'range' as const,
         getValue: () => (formData[field.key] as number) || 0,
         setValue: (val: number) => {
-          if (formData[field.key] === val) return;
-
-          // Format value if needed
           const formattedValue = field.allowDecimals ? val : formatValue(val);
+
+          if (formData[field.key] === formattedValue) return;
           formData[field.key] = formattedValue;
 
-          // Update the store
           const storeKey = field.storeKey || field.key;
 
-          // Special case for percentage values stored as fractions
-          const storeValue =
-            field.unit === '%' && storeKey.includes('Fraction') && formattedValue > 1
-              ? formattedValue / 100
-              : formattedValue;
+          // Convert percentage to fraction for usable battery
+          const storeValue = field.key === 'usableFraction' ? formattedValue / 100 : formattedValue;
 
-          settingsStore.update({ [storeKey]: storeValue });
+          updateStore(storeKey as keyof CalculatorData, storeValue);
           saveAndCalculate();
         }
       };
@@ -182,7 +178,7 @@
 
   // Helper function to save data and calculate results
   function saveAndCalculate(): void {
-    if (isInitialized) {
+    if (isInitialized && isFormDataValid()) {
       calculateResults();
     }
   }
@@ -190,16 +186,19 @@
   // Calculate results using the provided function
   function calculateResults(): void {
     try {
-      // Reset error state
       error = null;
 
       // Only calculate if all required values are valid
       if (isFormDataValid()) {
+        // Convert usableFraction to decimal for calculation
+        const calculationData = { ...formData };
+        if ('usableFraction' in calculationData) {
+          calculationData.usableFraction = Number(calculationData.usableFraction) / 100;
+        }
+
         // Use the provided calculation function
-        results = calculateFn(formData);
+        results = calculateFn(calculationData as Record<string, number>);
         updateTips();
-      } else {
-        resetResults();
       }
     } catch (err) {
       console.error('Calculation error:', err);
@@ -212,7 +211,7 @@
   function isFormDataValid(): boolean {
     return Object.entries(formData).every(([key, value]) => {
       // Find the corresponding field definition
-      const field = inputFields.find((f: (typeof inputFields)[number]) => f.key === key);
+      const field = inputFields.find((f: InputField) => f.key === key);
 
       // Skip validation for select inputs - they're always valid once selected
       if (field?.type === 'select') return true;
@@ -225,12 +224,12 @@
   // Reset results to defaults
   function resetResults(): void {
     results = {};
-    tips = getErrorTips();
+    tips = getErrorTips?.() || ['Check your input values and try again'];
   }
 
   // Update tips based on calculation results
   function updateTips(): void {
-    tips = getTips({ ...formData, ...results });
+    tips = getTips?.({ ...formData, ...results }) || [];
   }
 
   // StatsComponent will be passed as a prop

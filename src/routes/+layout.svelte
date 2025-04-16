@@ -1,31 +1,17 @@
 <script lang="ts">
   import '../app.css';
-  import ThemeSwitcher from '$lib/components/ui/ThemeSwitcher.svelte';
   import Navigation from '$lib/components/layout/Navigation.svelte';
   import Footer from '$lib/components/layout/Footer.svelte';
   import { page } from '$app/stores';
   import Analytics from '$lib/components/util/Analytics.svelte';
   import CookieBanner from '$lib/components/ui/CookieBanner.svelte';
-  import { settingsStore } from '$lib/state/SettingsStore';
+  import { effectiveTheme } from '$lib/state/ThemeStore';
   import type { LayoutData } from './$types';
 
   let { children, data } = $props<{
     children: any;
     data: LayoutData;
   }>();
-
-  // Apply theme from the layout data
-  $effect(() => {
-    if (data.theme) {
-      // Update store to keep it in sync
-      settingsStore.update({ theme: data.theme as 'light' | 'dark' });
-
-      // Set theme on body
-      if (typeof document !== 'undefined') {
-        document.body.setAttribute('data-theme', data.theme);
-      }
-    }
-  });
 
   // Default SEO data
   const defaultSeo = {
@@ -82,10 +68,10 @@
   <Analytics />
 </svelte:head>
 
-<div class="flex min-h-screen flex-col transition-colors">
+<div class="flex min-h-screen flex-col transition-colors" data-theme={$effectiveTheme}>
   <header class="bg-base-100 border-base-300 border-b shadow-sm">
     <div class="container-custom">
-      <Navigation currentTheme={data.theme as 'light' | 'dark'} />
+      <Navigation />
     </div>
   </header>
 

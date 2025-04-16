@@ -8,9 +8,47 @@
       name="description"
       content="EV Charge Frequency Estimator - Calculate how many times you need to charge your electric vehicle per week"
     />
+    <!-- Anti-flicker snippet -->
+    <style>
+      .theme-initializing {
+        opacity: 0 !important;
+        visibility: hidden !important;
+      }
+    </style>
+    <script>
+      (function() {
+        document.documentElement.classList.add('theme-initializing');
+        try {
+          const stored = localStorage.getItem('theme');
+          let theme = 'light';
+          
+          if (stored) {
+            const data = JSON.parse(stored);
+            theme = data.current === 'system' 
+              ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+              : data.current;
+          }
+          
+          document.documentElement.setAttribute('data-theme', theme);
+
+          // Wait for styles to be applied and then show content
+          window.addEventListener('load', function() {
+            // Add a small delay to ensure styles are properly applied
+            setTimeout(function() {
+              requestAnimationFrame(function() {
+                document.documentElement.classList.remove('theme-initializing');
+              });
+            }, 150); // Small delay to ensure proper theme application
+          });
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.classList.remove('theme-initializing');
+        }
+      })();
+    </script>
     %sveltekit.head%
   </head>
-  <body data-sveltekit-preload-data="hover" data-theme="light">
+  <body data-sveltekit-preload-data="hover">
     <div style="display: contents">%sveltekit.body%</div>
   </body>
 </html>
