@@ -1,20 +1,18 @@
 import { browser } from '$app/environment';
+import { themeStore } from '$lib/state/ThemeStore';
+import { calculatorStore } from '$lib/state/CalculatorStore';
+import { get } from 'svelte/store';
 
 export function load() {
   let theme = 'light'; // Default theme
 
   if (browser) {
     try {
-      const storedData = localStorage.getItem('ev-calculator-data');
-
-      if (storedData) {
-        const parsedData = JSON.parse(storedData);
-        if (parsedData && parsedData.theme && (parsedData.theme === 'light' || parsedData.theme === 'dark')) {
-          theme = parsedData.theme;
-        }
-      }
+      const themeState = get(themeStore);
+      const calculatorState = get(calculatorStore);
+      theme = themeState.current === 'system' ? themeState.system : themeState.current;
     } catch (error) {
-      console.error('Failed to load theme from localStorage:', error);
+      console.error('Failed to load data from storage:', error);
     }
   }
 

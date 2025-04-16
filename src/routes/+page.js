@@ -1,27 +1,23 @@
 import { browser } from '$app/environment';
 import { DEFAULT_VALUES } from '$lib/utils/constants';
+import { calculatorStorage } from '$lib/utils/storage';
 
 export function load() {
   // Initialize with default values
   let calculatorData = { ...DEFAULT_VALUES };
 
-  // Only access localStorage in the browser
+  // Only access storage in the browser
   if (browser) {
     try {
-      const storedData = localStorage.getItem('ev-calculator-data');
-      
+      const storedData = calculatorStorage.get();
       if (storedData) {
-        const parsedData = JSON.parse(storedData);
-        // Use stored data if valid, otherwise fallback to defaults
-        if (parsedData && typeof parsedData === 'object') {
-          calculatorData = {
-            ...calculatorData, // Keep defaults as fallback
-            ...parsedData // Override with stored values
-          };
-        }
+        calculatorData = {
+          ...calculatorData,
+          ...storedData
+        };
       }
     } catch (error) {
-      console.error('Failed to load settings from localStorage:', error);
+      console.error('Failed to load calculator data from storage:', error);
     }
   }
 

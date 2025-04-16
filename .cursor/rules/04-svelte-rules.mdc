@@ -74,6 +74,12 @@ Runes MUST only be used in *.svelte files, otherwise import the correct function
 
 When using the Svelte framework, utilize its declarative syntax and features. Here are examples:
 
+### 0. Runes are only available inside `.svelte` and `.svelte.js/ts` files
+<example>
+The `$state` rune is only available inside `.svelte` and `.svelte.js/ts` files
+https://svelte.dev/e/rune_outside_svelte
+</example>
+
 ### 1. Reactive Declarations ###
 Reactive declarations automatically update when dependencies change.
 ```svelte

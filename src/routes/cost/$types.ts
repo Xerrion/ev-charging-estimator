@@ -1,4 +1,4 @@
-import type { StorageData } from '$lib/state/SettingsStore';
+import type { CalculatorData } from '$lib/state/CalculatorStore';
 
 export type RegionalRates = {
   [country: string]: {
@@ -29,8 +29,8 @@ export type Currency = {
 };
 
 export type PageData = {
-  calculatorData: StorageData;
+  calculatorData: CalculatorData;
   regionalRates: RegionalRates;
   chargingNetworks: ChargingNetworks;
   currencies: Currency[];
-}; 
+};

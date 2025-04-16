@@ -71,7 +71,8 @@
       <span>{message}</span>
       {#if dismissible}
         <button class="btn btn-ghost btn-sm" onclick={dismiss}>
-          <img src={xIcon} alt="Close" class="h-5 w-5" />
+          {@html xIcon}
+          <span class="sr-only">Dismiss</span>
         </button>
       {/if}
     </div>

@@ -6,14 +6,15 @@
   import { calculateChargingCost, calculateWeeklyCharges } from '$lib/utils/calculations';
   import { getCurrencyOptions } from '$lib/data/currencies';
   import Card from '$lib/components/ui/Card.svelte';
-  import { settingsStore } from '$lib/state/SettingsStore';
+  import { calculatorStore } from '$lib/state/CalculatorStore';
+  import { get } from 'svelte/store';
 
   // Rate type options
   type RateType = 'flat' | 'variable';
 
   // State for rate type and currency
   let rateType = $state<RateType>('flat');
-  let selectedCurrency = $state(DEFAULT_VALUES.selectedCurrency);
+  let selectedCurrency = $state(get(calculatorStore).currency);
   let currencyOptions = $state(getCurrencyOptions());
 
   $effect(() => {
@@ -220,21 +221,28 @@
 
     if (type === 'variable') {
       // Initialize variable rates if they're zeroed out
-      settingsStore.subscribe((settings) => {
-        if (settings.peakElectricityRate === 0) {
-          settingsStore.update({
-            peakElectricityRate: settings.electricityRate * 1.5,
-            offPeakElectricityRate: settings.electricityRate * 0.7
-          });
+      calculatorStore.subscribe((state) => {
+        if (state.peakElectricityRate === 0) {
+          calculatorStore.updateValue('peakElectricityRate', state.electricityRate * 1.5);
+          calculatorStore.updateValue('offPeakElectricityRate', state.electricityRate * 0.7);
         }
       })();
     }
   }
 
-  // Handle currency change
-  function handleCurrencyChange(currency: string): void {
-    selectedCurrency = currency;
-    settingsStore.update({ selectedCurrency });
+  // Subscribe to currency changes
+  $effect(() => {
+    const state = get(calculatorStore);
+    if (state.currency !== selectedCurrency) {
+      calculatorStore.updateValue('currency', selectedCurrency);
+    }
+  });
+
+  // Update currency when selected
+  function handleCurrencySelect(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    selectedCurrency = select.value;
+    calculatorStore.updateValue('currency', selectedCurrency);
   }
 </script>
 
@@ -284,7 +292,7 @@
         <label for="currency-select" class="label">
           <span class="label-text">Select Currency</span>
         </label>
-        <select id="currency-select" class="select select-bordered w-full" bind:value={selectedCurrency}>
+        <select id="currency-select" class="select select-bordered w-full" onchange={handleCurrencySelect}>
           {#each currencyOptions as option}
             <option value={option.value}>{option.label}</option>
           {/each}
