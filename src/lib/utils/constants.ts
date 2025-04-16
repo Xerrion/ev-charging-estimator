@@ -110,7 +110,7 @@ export const INPUT_RANGES = {
   // Electricity rate in currency units per kWh
   ELECTRICITY_RATE: {
     MIN: 0.01,
-    MAX: 1,
+    MAX: 100,
     STEP: 0.01
   },
 

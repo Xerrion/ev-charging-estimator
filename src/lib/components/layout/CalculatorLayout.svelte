@@ -28,9 +28,7 @@
 
   {#if explanation}
     <Card>
-      <svelte:fragment>
-        {@html explanation()}
-      </svelte:fragment>
+      {@html explanation()}
     </Card>
   {/if}
 </div>

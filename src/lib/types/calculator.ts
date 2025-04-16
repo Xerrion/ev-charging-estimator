@@ -63,8 +63,8 @@ export interface CalculatorProps {
   title?: string;
   inputFields: InputField[];
   calculateFn: (formData: Record<string, number>) => CalculatorResults;
-  statsComponent: any;
-  getTips?: (data: Record<string, any>) => string[];
+  statsComponent: never;
+  getTips?: (data: Record<string, unknown>) => string[];
   getErrorTips?: () => string[];
   children?: () => unknown;
   currency?: string;

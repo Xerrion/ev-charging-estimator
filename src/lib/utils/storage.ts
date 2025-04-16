@@ -82,47 +82,6 @@ export function setValue(key: string, value: StorageValue, options: StorageOptio
   }
 }
 
-/**
- * Checks if a value exists in storage
- */
-export function hasValue(key: string, options: StorageOptions = DEFAULT_OPTIONS): boolean {
-  const storage = getStorage(options.storage);
-  return storage.getItem(key) !== null;
-}
-
-/**
- * Removes a value from storage
- */
-export function removeValue(key: string, options: StorageOptions = DEFAULT_OPTIONS): void {
-  const storage = getStorage(options.storage);
-  storage.removeItem(key);
-}
-
-/**
- * Clears all values from storage
- */
-export function clearStorage(options: StorageOptions = DEFAULT_OPTIONS): void {
-  const storage = getStorage(options.storage);
-  storage.clear();
-}
-
-/**
- * Gets all storage values
- */
-export function getAllValues(options: StorageOptions = DEFAULT_OPTIONS): Record<string, StorageValue> {
-  const storage = getStorage(options.storage);
-  const values: Record<string, StorageValue> = {};
-
-  for (let i = 0; i < storage.length; i++) {
-    const key = storage.key(i);
-    if (key) {
-      values[key] = getValue(key, options);
-    }
-  }
-
-  return values;
-}
-
 export interface TypedStorage<T> {
   get: () => T | null;
   set: (value: T) => void;

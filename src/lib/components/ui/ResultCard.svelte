@@ -20,17 +20,15 @@
 </script>
 
 <Card {className}>
-  <svelte:fragment>
-    <div class="flex items-start justify-between">
-      <div class="flex-1">
-        <h3 class="text-base-content mb-2 font-semibold">{title}</h3>
-        <div class="text-{color} mb-2 text-3xl font-bold">
-          {formatValue(value)}{value ? unit : ''}
-        </div>
-        {#if description}
-          <p class="text-base-content/70 text-sm">{description}</p>
-        {/if}
+  <div class="flex items-start justify-between">
+    <div class="flex-1">
+      <h3 class="text-base-content mb-2 font-semibold">{title}</h3>
+      <div class="text-{color} mb-2 text-3xl font-bold">
+        {formatValue(value)}{value ? unit : ''}
       </div>
+      {#if description}
+        <p class="text-base-content/70 text-sm">{description}</p>
+      {/if}
     </div>
-  </svelte:fragment>
+  </div>
 </Card>

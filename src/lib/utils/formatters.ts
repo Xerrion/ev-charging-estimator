@@ -71,6 +71,7 @@ export function formatDistance(kilometers: number): string {
   }
   return `${Math.round(kilometers)} km`;
 }
+
 /**
  * Formats a value to ensure it's a valid number and handles decimals appropriately
  */
@@ -79,9 +80,10 @@ function formatValueDecimals(val: number, allowDecimals: boolean): number {
   return allowDecimals ? val : Math.round(val);
 }
 
-// Helper function to format the value if it's a number
+/**
+ * Helper function to format a value if it's a number
+ */
 export function formatValue(val: number): number {
   const formattedValue = formatValueDecimals(val, true);
-
   return formattedValue;
 }

@@ -57,28 +57,22 @@
   function calculateResults(formData: Record<string, number>) {
     const { weeklyDistanceKm, batteryKwh, consumptionKwhPer100km, usableFraction } = formData;
 
-    // Convert usableFraction from percent to decimal
-    // Ensure we're working with a proper decimal (0-1 range)
-    const fraction = usableFraction > 1 ? usableFraction / 100 : usableFraction;
-
+    // The usableFraction is already properly converted to decimal in BaseCalculator's calculateResults function
     return weeklyEvChargeEstimator({
       weeklyDistanceKm,
       batteryKwh,
       consumptionKwhPer100km,
-      usableFraction: fraction
+      usableFraction
     });
   }
 
   // Tips function
   function getTips(data: Record<string, any>) {
-    // Ensure usableFraction is properly converted to decimal (0-1 range)
-    const usableFraction = data.usableFraction > 1 ? data.usableFraction / 100 : data.usableFraction;
-
     return getFrequencyTips({
       weeklyDistanceKm: data.weeklyDistanceKm,
       batteryKwh: data.batteryKwh,
       consumptionKwhPer100km: data.consumptionKwhPer100km,
-      usableFraction,
+      usableFraction: data.usableFraction,
       effectiveRangeKm: data.effectiveRangeKm,
       weeklyCharges: data.weeklyCharges
     });

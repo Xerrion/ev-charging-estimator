@@ -19,3 +19,4 @@ export interface Settings {
 export * from './calculator';
 export * from './theme';
 export * from './consent';
+export * from './input';

@@ -28,66 +28,92 @@
   let isInitialized = $state(false);
   let error = $state<string | null>(null);
 
+  // Initialize settings from calculator store
+  let settings = $state<CalculatorData>(get(calculatorStore));
+
+  // Prepare initial form data from settings
+  function prepareInitialFormData(): FormData {
+    if (!inputFields || inputFields.length === 0) {
+      // Return empty object if inputFields aren't ready yet
+      return {};
+    }
+
+    const initialData: FormData = {};
+
+    inputFields.forEach((field: InputField) => {
+      const storeKey = field.storeKey || field.key;
+      const storedValue = settings[storeKey as keyof CalculatorData];
+
+      if (storedValue !== undefined && storedValue !== null) {
+        if (field.type === 'range' || field.type === 'number') {
+          const numValue = Number(storedValue);
+          if (!isNaN(numValue)) {
+            // Convert fraction to percentage for usable battery
+            if (field.key === 'usableFraction') {
+              initialData[field.key] = numValue * 100;
+            } else {
+              initialData[field.key] = numValue;
+            }
+          } else {
+            initialData[field.key] = field.type === 'range' || field.type === 'number' ? 0 : '';
+          }
+        } else if (field.type === 'select' || field.type === 'radio') {
+          initialData[field.key] = String(storedValue);
+        } else {
+          initialData[field.key] = storedValue;
+        }
+      } else {
+        initialData[field.key] = field.type === 'range' || field.type === 'number' ? 0 : '';
+      }
+    });
+
+    return initialData;
+  }
+
   // Form data and results
   let formData = $state<FormData>({});
   let results = $state<CalculatorResults>({});
   let tips = $state<string[]>([]);
-  let settings = $state<CalculatorData>(DEFAULT_VALUES.CALCULATOR);
 
   // Initialize with timeout for smoother UX
   $effect(() => {
+    // Use setTimeout to ensure the component is fully mounted
+    // and inputFields are available before initializing form data
     setTimeout(() => {
-      initializeFromStore();
-    }, 1000);
+      if (!isInitialized) {
+        refreshFromStore();
+      }
+    }, 100); // Short delay to ensure props are available
   });
 
-  // Initialize form data from calculator store
-  function initializeFromStore(): void {
+  // Refresh data from calculator store
+  function refreshFromStore(): void {
     try {
-      isLoading = true;
+      if (!inputFields || inputFields.length === 0) {
+        // Skip processing if inputFields aren't ready
+        return;
+      }
+
       settings = get(calculatorStore);
+      formData = prepareInitialFormData();
 
-      formData = inputFields.reduce((acc: FormData, field: InputField) => {
-        const storeKey = field.storeKey || field.key;
-        const storedValue = settings[storeKey as keyof CalculatorData];
+      // Set initialized state and run initial calculation if data is valid
+      if (!isInitialized) {
+        isInitialized = true;
 
-        let value: number | string;
-
-        if (storedValue !== undefined && storedValue !== null) {
-          if (field.type === 'range' || field.type === 'number') {
-            const numValue = Number(storedValue);
-            if (!isNaN(numValue)) {
-              // Convert fraction to percentage for usable battery
-              if (field.key === 'usableFraction') {
-                value = numValue * 100;
-              } else {
-                value = numValue;
-              }
-            } else {
-              value = field.type === 'range' || field.type === 'number' ? 0 : '';
-            }
-          } else if (field.type === 'select' || field.type === 'radio') {
-            value = String(storedValue);
-          } else {
-            value = storedValue;
+        // Add a small delay before calculating results to ensure form data is ready
+        setTimeout(() => {
+          if (isFormDataValid()) {
+            calculateResults();
           }
-        } else {
-          value = field.type === 'range' || field.type === 'number' ? 0 : '';
-        }
-
-        acc[field.key] = value;
-        return acc;
-      }, {});
-
-      isInitialized = true;
-
-      if (isFormDataValid()) {
-        calculateResults();
+          isLoading = false;
+        }, 50);
+      } else {
+        isLoading = false;
       }
     } catch (err) {
       console.error('Error initializing form data:', err);
       error = err instanceof Error ? err.message : 'Failed to initialize';
-    } finally {
       isLoading = false;
     }
   }
@@ -166,10 +192,8 @@
 
           const storeKey = field.storeKey || field.key;
 
-          // Convert percentage to fraction for usable battery
-          const storeValue = field.key === 'usableFraction' ? formattedValue / 100 : formattedValue;
-
-          updateStore(storeKey as keyof CalculatorData, storeValue);
+          // Don't divide by 100 here, updateStore will handle the conversion
+          updateStore(storeKey as keyof CalculatorData, formattedValue);
           saveAndCalculate();
         }
       };
@@ -197,7 +221,7 @@
         }
 
         // Use the provided calculation function
-        results = calculateFn(calculationData as Record<string, number>);
+        results = calculateFn(calculationData as Record<string, number | string>);
         updateTips();
       }
     } catch (err) {
@@ -209,12 +233,14 @@
 
   // Check if all form values are valid (greater than 0 for numbers, non-empty for strings)
   function isFormDataValid(): boolean {
+    if (Object.keys(formData).length === 0) return false;
+
     return Object.entries(formData).every(([key, value]) => {
       // Find the corresponding field definition
       const field = inputFields.find((f: InputField) => f.key === key);
 
-      // Skip validation for select inputs - they're always valid once selected
-      if (field?.type === 'select') return true;
+      // Skip validation for select inputs and radio inputs - they're always valid once selected
+      if (field?.type === 'select' || field?.type === 'radio') return true;
 
       // Numeric inputs should be greater than 0
       return Number(value) > 0;
@@ -229,7 +255,15 @@
 
   // Update tips based on calculation results
   function updateTips(): void {
-    tips = getTips?.({ ...formData, ...results }) || [];
+    // Convert usableFraction from percentage to decimal for the tips function
+    const tipData = { ...formData, ...results };
+
+    // Convert usableFraction to decimal for tips calculation
+    if ('usableFraction' in tipData) {
+      tipData.usableFraction = Number(tipData.usableFraction) / 100;
+    }
+
+    tips = getTips?.(tipData) || [];
   }
 
   // StatsComponent will be passed as a prop

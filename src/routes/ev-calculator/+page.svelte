@@ -57,14 +57,12 @@
   function calculateFrequency(formData: Record<string, number>) {
     const { weeklyDistanceKm, batteryKwh, consumptionKwhPer100km, usableFraction } = formData;
 
-    // Need to convert usableFraction back to decimal for the calculation
-    const fraction = usableFraction / 100;
-
+    // The usableFraction is already properly converted to decimal in BaseCalculator's calculateResults function
     return weeklyEvChargeEstimator({
       weeklyDistanceKm,
       batteryKwh,
       consumptionKwhPer100km,
-      usableFraction: fraction
+      usableFraction
     });
   }
 
@@ -74,7 +72,7 @@
       weeklyDistanceKm: data.weeklyDistanceKm,
       batteryKwh: data.batteryKwh,
       consumptionKwhPer100km: data.consumptionKwhPer100km,
-      usableFraction: data.usableFraction / 100,
+      usableFraction: data.usableFraction,
       effectiveRangeKm: data.effectiveRangeKm,
       weeklyCharges: data.weeklyCharges
     });
