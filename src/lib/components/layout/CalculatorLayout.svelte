@@ -20,15 +20,13 @@
   const CalculatorComponent = calculator();
 </script>
 
-<div class="w-full">
-  <Card className="mb-6" {title} {description}></Card>
-  {#if CalculatorComponent}
-    <CalculatorComponent {...calculatorProps} />
-  {/if}
+<Card className="mb-6" {title} {description}></Card>
+{#if CalculatorComponent}
+  <CalculatorComponent {...calculatorProps} />
+{/if}
 
-  {#if explanation}
-    <Card>
-      {@html explanation()}
-    </Card>
-  {/if}
-</div>
+{#if explanation}
+  <Card>
+    {@html explanation()}
+  </Card>
+{/if}

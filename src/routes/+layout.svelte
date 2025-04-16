@@ -7,6 +7,7 @@
   import CookieBanner from '$lib/components/ui/CookieBanner.svelte';
   import { effectiveTheme } from '$lib/state/ThemeStore';
   import type { LayoutData } from './$types';
+  import Header from '$lib/components/ui/Header.svelte';
 
   let { children, data } = $props<{
     children: any;
@@ -67,22 +68,12 @@
   <!-- Include Analytics component (doesn't render anything visible) -->
   <Analytics />
 </svelte:head>
-
 <div class="flex min-h-screen flex-col transition-colors" data-theme={$effectiveTheme}>
-  <header class="bg-base-100 border-base-300 border-b shadow-sm">
-    <div class="container-custom">
-      <Navigation />
-    </div>
-  </header>
-
-  <main class="container-custom flex-grow py-8">
-    <div class="mx-auto w-full max-w-3xl">
-      {@render children()}
-    </div>
+  <Header />
+  <main class="flex-grow">
+    {@render children()}
   </main>
 
   <Footer />
-
-  <!-- Cookie banner -->
   <CookieBanner />
 </div>
