@@ -196,8 +196,3 @@ export function getCostTips(): string[] {
     'Consider using a smart charger that can automatically charge during cheaper rate periods'
   ];
 }
-
-// Error Tips
-export function getErrorTips(): string[] {
-  return ['Check your input values and try again', 'Make sure all parameters are within reasonable ranges'];
-}

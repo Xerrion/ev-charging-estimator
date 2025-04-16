@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Components/routes should be as bare as possible
+- If helper functions are needed, they MUST refactored into util file
+- All constants, types and interfaces MUST be refactored in to their own files.

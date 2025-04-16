@@ -1,0 +1,27 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# DRY (Dont Repeat Yourself)
+
+Single Source of Truth – Each piece of knowledge or logic should exist in only one place in the system.
+
+Avoid Code Duplication – Repeated logic should be abstracted into functions, classes, or modules.
+
+Improves Maintainability – Changes need to be made in only one location, reducing the risk of inconsistencies.
+
+Enhances Readability – Less repetition leads to cleaner, more concise code.
+
+Encourages Abstraction – Promotes identifying patterns and generalizing solutions.
+
+Reduces Bugs – Fewer copies of logic mean fewer places where bugs can be introduced.
+
+Applies Beyond Code – Also relevant to documentation, configurations, and database schemas.
+
+Promotes Reusability – Common logic becomes modular and reusable across different parts of the system.
+
+Faster Onboarding – New developers can understand systems quicker with less duplicated logic.
+
+Eases Refactoring – Modular and centralized code is simpler to refactor or extend.

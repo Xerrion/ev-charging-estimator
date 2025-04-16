@@ -2,7 +2,7 @@
   import BaseCalculator from '$lib/components/calculators/BaseCalculator.svelte';
   import FrequencyStats from '$lib/components/calculators/frequency/FrequencyStats.svelte';
   import { INPUT_RANGES } from '$lib/utils/constants';
-  import { getFrequencyTips, getErrorTips } from '$lib/utils/tips';
+  import { getFrequencyTips } from '$lib/utils/tips';
   import { weeklyEvChargeEstimator } from '$lib/utils/calculations';
 
   // Define input fields for the frequency calculator
@@ -93,5 +93,4 @@
   calculateFn={calculateFrequency}
   statsComponent={FrequencyStats}
   {getTips}
-  {getErrorTips}
 />

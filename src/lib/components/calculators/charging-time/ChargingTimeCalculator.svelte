@@ -1,108 +1,13 @@
 <script lang="ts">
   import BaseCalculator from '$lib/components/calculators/BaseCalculator.svelte';
   import ChargingTimeStats from './ChargingTimeStats.svelte';
-  import { INPUT_RANGES } from '$lib/utils/constants';
-  import { getChargingTimeTips, getErrorTips } from '$lib/utils/tips';
+  import {
+    chargingTimeInputFields,
+    calculateChargingTimeResults,
+    getChargingTimeCalculatorTips
+  } from '$lib/utils/calculators/charging-time';
   import { calculateChargingTime } from '$lib/utils/calculations';
-
-  // Define input fields configuration
-  const inputFields = [
-    {
-      id: 'charging-type',
-      label: 'Charging Type',
-      key: 'chargingType',
-      storeKey: 'chargingType',
-      type: 'radio' as const,
-      options: [
-        { value: 'AC', label: 'AC Charging (Home/Destination)' },
-        { value: 'DC', label: 'DC Fast Charging' }
-      ]
-    },
-    {
-      id: 'battery-capacity',
-      label: 'Battery Capacity',
-      key: 'batteryKwh',
-      storeKey: 'batteryKwh',
-      type: 'range' as const,
-      min: INPUT_RANGES.BATTERY_CAPACITY.MIN,
-      max: INPUT_RANGES.BATTERY_CAPACITY.MAX,
-      step: INPUT_RANGES.BATTERY_CAPACITY.STEP,
-      unit: 'kWh',
-      allowDecimals: false
-    },
-    {
-      id: 'initial-charge',
-      label: 'Initial Charge',
-      key: 'initialCharge',
-      storeKey: 'initialCharge',
-      type: 'range' as const,
-      min: INPUT_RANGES.BATTERY_CHARGE.MIN,
-      max: INPUT_RANGES.BATTERY_CHARGE.MAX,
-      step: INPUT_RANGES.BATTERY_CHARGE.STEP,
-      unit: '%',
-      allowDecimals: false
-    },
-    {
-      id: 'target-charge',
-      label: 'Target Charge',
-      key: 'targetCharge',
-      storeKey: 'targetCharge',
-      type: 'range' as const,
-      min: INPUT_RANGES.BATTERY_CHARGE.MIN,
-      max: INPUT_RANGES.BATTERY_CHARGE.MAX,
-      step: INPUT_RANGES.BATTERY_CHARGE.STEP,
-      unit: '%',
-      allowDecimals: false
-    },
-    {
-      id: 'charging-power',
-      label: 'Charging Power',
-      key: 'chargingPower',
-      storeKey: 'chargingPower',
-      type: 'range' as const,
-      min: INPUT_RANGES.CHARGING_POWER.MIN,
-      max: INPUT_RANGES.CHARGING_POWER.MAX,
-      step: INPUT_RANGES.CHARGING_POWER.STEP,
-      unit: 'kW',
-      allowDecimals: true
-    },
-    {
-      id: 'charging-efficiency',
-      label: 'Charging Efficiency',
-      key: 'chargingEfficiency',
-      storeKey: 'chargingEfficiency',
-      type: 'range' as const,
-      min: INPUT_RANGES.CHARGING_EFFICIENCY.MIN,
-      max: INPUT_RANGES.CHARGING_EFFICIENCY.MAX,
-      step: INPUT_RANGES.CHARGING_EFFICIENCY.STEP,
-      unit: '%',
-      allowDecimals: false
-    },
-    {
-      id: 'temperature',
-      label: 'Battery Temperature',
-      key: 'temperatureC',
-      storeKey: 'temperatureC',
-      type: 'range' as const,
-      min: INPUT_RANGES.TEMPERATURE.MIN,
-      max: INPUT_RANGES.TEMPERATURE.MAX,
-      step: INPUT_RANGES.TEMPERATURE.STEP,
-      unit: '°C',
-      allowDecimals: false
-    },
-    {
-      id: 'phases',
-      label: 'Charging Phases',
-      key: 'phases',
-      storeKey: 'phases',
-      type: 'range' as const,
-      min: INPUT_RANGES.PHASES.MIN,
-      max: INPUT_RANGES.PHASES.MAX,
-      step: INPUT_RANGES.PHASES.STEP,
-      unit: '',
-      allowDecimals: false
-    }
-  ];
+  import { getChargingTimeTips } from '$lib/utils/tips';
 
   // Calculate function
   function calculateResults(formData: Record<string, number | string>) {
@@ -150,9 +55,8 @@
 
 <BaseCalculator
   title="Charging Parameters"
-  {inputFields}
-  calculateFn={calculateResults}
+  inputFields={chargingTimeInputFields}
+  calculateFn={calculateChargingTimeResults}
   statsComponent={ChargingTimeStats}
   {getTips}
-  {getErrorTips}
 />

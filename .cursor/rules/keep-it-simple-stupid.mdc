@@ -1,0 +1,27 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# KISS (Keep It Simple Stupid)
+
+Simplicity First – Design systems and solutions to be as simple as possible, avoiding unnecessary complexity.
+
+Minimize Components – Use the fewest parts/modules needed to achieve functionality.
+
+Ease of Understanding – Code, systems, and documentation should be easy to read and understand.
+
+Avoid Overengineering – Don’t add features or complexity "just in case"; build only what's required.
+
+Maintainability – Simpler designs are easier to maintain, debug, and extend.
+
+User-Centric – The end-user or operator should be able to interact with the system with minimal learning.
+
+Reliability – Fewer moving parts generally mean fewer potential points of failure.
+
+Cost-Effective – Simple solutions tend to require fewer resources to implement and maintain.
+
+Faster Development – Less complexity often translates to quicker implementation and deployment.
+
+Scalability Readiness – A simple foundation is easier to scale than a complex one.
