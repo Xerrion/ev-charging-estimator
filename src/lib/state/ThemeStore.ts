@@ -2,18 +2,8 @@ import { browser } from '$app/environment';
 import { BaseStore, type BaseStoreOptions } from './BaseStore';
 import { themeStorage, STORAGE_KEYS } from '$lib/utils/storage';
 import { derived, get } from 'svelte/store';
-
-export type Theme = 'light' | 'dark' | 'system';
-
-interface ThemeState {
-  current: Theme;
-  system: 'light' | 'dark';
-}
-
-const DEFAULT_THEME_STATE: ThemeState = {
-  current: 'system',
-  system: 'light'
-};
+import type { Theme, ThemeState } from '$lib/types';
+import { DEFAULT_VALUES } from '$lib/utils/constants';
 
 function validateThemeData(data: unknown): data is ThemeState {
   if (!data || typeof data !== 'object') return false;
@@ -34,13 +24,13 @@ class ThemeStore extends BaseStore<ThemeState> {
   constructor() {
     const options: BaseStoreOptions<ThemeState> = {
       key: STORAGE_KEYS.THEME,
-      initialValue: DEFAULT_THEME_STATE,
+      initialValue: DEFAULT_VALUES.THEME,
       validate: validateThemeData
     };
     super(options);
 
-    // Initialize system theme detection
     if (browser) {
+      // Initialize system theme detection
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
       const updateSystemTheme = (e: MediaQueryListEvent | MediaQueryList) => {
@@ -59,8 +49,9 @@ class ThemeStore extends BaseStore<ThemeState> {
       // Subscribe to theme changes and apply them
       this.subscribe((state) => {
         const theme = state.current === 'system' ? state.system : state.current;
-        document.documentElement.dataset.theme = theme;
-        document.body.dataset.theme = theme;
+        requestAnimationFrame(() => {
+          document.documentElement.setAttribute('data-theme', theme);
+        });
       });
     }
   }
@@ -81,7 +72,7 @@ class ThemeStore extends BaseStore<ThemeState> {
   }
 
   resetToDefaults(): void {
-    this.reset(DEFAULT_THEME_STATE);
+    this.reset(DEFAULT_VALUES.THEME);
   }
 }
 
@@ -92,10 +83,11 @@ export const effectiveTheme = derived(themeStore, ($theme) => {
   return $theme.current === 'system' ? $theme.system : $theme.current;
 });
 
-// Apply theme changes
-effectiveTheme.subscribe((theme) => {
-  if (browser) {
-    document.documentElement.setAttribute('data-theme', theme);
-    document.body.setAttribute('data-theme', theme);
-  }
-});
+// Apply theme changes using requestAnimationFrame for smoother transitions
+if (browser) {
+  effectiveTheme.subscribe((theme) => {
+    requestAnimationFrame(() => {
+      document.documentElement.setAttribute('data-theme', theme);
+    });
+  });
+}

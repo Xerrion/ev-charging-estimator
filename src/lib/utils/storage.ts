@@ -1,7 +1,5 @@
 import { browser } from '$app/environment';
-import type { CalculatorData } from '$lib/state/CalculatorStore';
-import type { ConsentData } from '$lib/state/ConsentStore';
-import type { Theme } from '$lib/state/ThemeStore';
+import type { CalculatorData, ConsentData, ThemeState } from '$lib/types';
 
 /**
  * Storage options for configuring storage behavior
@@ -170,7 +168,7 @@ function createStorage<T>(key: string): TypedStorage<T> {
 export const calculatorStorage = createStorage<CalculatorData>(STORAGE_KEYS.CALCULATOR);
 
 // Type-safe storage for theme
-export const themeStorage = createStorage<Theme>(STORAGE_KEYS.THEME);
+export const themeStorage = createStorage<ThemeState>(STORAGE_KEYS.THEME);
 
 // Type-safe storage for consent data
 export const consentStorage = createStorage<ConsentData>(STORAGE_KEYS.CONSENT);

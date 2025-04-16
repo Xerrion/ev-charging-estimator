@@ -12,7 +12,7 @@
   $effect(() => {
     if (browser) {
       const unsubscribe = consentStore.subscribe((consent) => {
-        bannerVisible = !consent.analytics;
+        bannerVisible = !consent.accepted;
       });
       return unsubscribe;
     }
@@ -20,12 +20,12 @@
 
   // Handle consent
   function acceptStorage() {
-    consentStore.updateConsent('analytics', true);
+    consentStore.updateConsent('accepted', true);
     bannerVisible = false;
   }
 
   function rejectStorage() {
-    consentStore.updateConsent('analytics', false);
+    consentStore.updateConsent('accepted', false);
     // Reset all stores when consent is rejected
     calculatorStore.resetToDefaults();
     themeStore.resetToDefaults();

@@ -1,9 +1,7 @@
 <script lang="ts">
   import { calculatorStore } from '$lib/state/CalculatorStore';
   import type { CalculatorData, FormData, InputField, CalculatorProps, CalculatorResults } from '$lib/types';
-  import { DEFAULT_VALUES, INPUT_RANGES } from '$lib/utils/constants';
   import { get } from 'svelte/store';
-
   import { formatValue } from '$lib/utils/formatters';
   import Alert from '../ui/Alert.svelte';
   import ParameterForm from '../ui/ParameterForm.svelte';
@@ -11,6 +9,7 @@
   import StatsSkeleton from '../ui/skeletons/StatsSkeleton.svelte';
   import TipsSkeleton from '../ui/skeletons/TipsSkeleton.svelte';
   import Tips from '../ui/Tips.svelte';
+  import { DEFAULT_VALUES } from '$lib/utils/constants';
 
   // Configurable props
   let {
@@ -20,8 +19,8 @@
     statsComponent,
     getTips = () => [],
     getErrorTips = () => ['Check your input values and try again'],
-    children,
-    currency
+    children = undefined,
+    currency = undefined
   } = $props();
 
   // Component state
@@ -33,35 +32,47 @@
   let formData = $state<FormData>({});
   let results = $state<CalculatorResults>({});
   let tips = $state<string[]>([]);
+  let settings = $state<CalculatorData>(DEFAULT_VALUES.CALCULATOR);
 
   // Initialize with timeout for smoother UX
   $effect(() => {
     setTimeout(() => {
       initializeFromStore();
-    }, 800);
+    }, 1000);
   });
 
   // Initialize form data from calculator store
   function initializeFromStore(): void {
     try {
       isLoading = true;
+      settings = get(calculatorStore);
+
       formData = inputFields.reduce((acc: FormData, field: InputField) => {
         const storeKey = field.storeKey || field.key;
-        const settings = get(calculatorStore);
         const storedValue = settings[storeKey as keyof CalculatorData];
-        const defaultValue = field.type === 'range' || field.type === 'number' ? 0 : '';
 
-        let value: number | string = defaultValue;
+        let value: number | string;
 
         if (storedValue !== undefined && storedValue !== null) {
           if (field.type === 'range' || field.type === 'number') {
             const numValue = Number(storedValue);
             if (!isNaN(numValue)) {
-              value = field.unit === '%' ? numValue * 100 : numValue;
+              // Convert fraction to percentage for usable battery
+              if (field.key === 'usableFraction') {
+                value = numValue * 100;
+              } else {
+                value = numValue;
+              }
+            } else {
+              value = field.type === 'range' || field.type === 'number' ? 0 : '';
             }
           } else if (field.type === 'select' || field.type === 'radio') {
             value = String(storedValue);
+          } else {
+            value = storedValue;
           }
+        } else {
+          value = field.type === 'range' || field.type === 'number' ? 0 : '';
         }
 
         acc[field.key] = value;
@@ -70,13 +81,30 @@
 
       isInitialized = true;
 
-      // Calculate initial results
-      calculateResults();
+      if (isFormDataValid()) {
+        calculateResults();
+      }
     } catch (err) {
       console.error('Error initializing form data:', err);
       error = err instanceof Error ? err.message : 'Failed to initialize';
     } finally {
       isLoading = false;
+    }
+  }
+
+  // Update store with new value
+  function updateStore(key: keyof CalculatorData, value: number | string) {
+    // Get current store value first
+    const currentValue = get(calculatorStore)[key];
+
+    // Convert percentage to fraction for usable battery before comparing
+    if (key === 'usableFraction') {
+      const newValue = Number(value) / 100;
+      if (currentValue !== newValue) {
+        calculatorStore.updateValue(key, newValue);
+      }
+    } else if (currentValue !== value) {
+      calculatorStore.updateValue(key, value);
     }
   }
 
@@ -93,10 +121,7 @@
           getValue: () => (formData[field.key] as string) || '',
           setValue: (val: string) => {
             if (formData[field.key] === val) return;
-
             formData[field.key] = val;
-
-            // Update the store
             const storeKey = field.storeKey || field.key;
             updateStore(storeKey as keyof CalculatorData, val);
             saveAndCalculate();
@@ -114,10 +139,7 @@
           getValue: () => (formData[field.key] as string) || '',
           setValue: (val: string) => {
             if (formData[field.key] === val) return;
-
             formData[field.key] = val;
-
-            // Update the store
             const storeKey = field.storeKey || field.key;
             updateStore(storeKey as keyof CalculatorData, val);
             saveAndCalculate();
@@ -137,20 +159,15 @@
         type: 'range' as const,
         getValue: () => (formData[field.key] as number) || 0,
         setValue: (val: number) => {
-          if (formData[field.key] === val) return;
-
-          // Format value if needed
           const formattedValue = field.allowDecimals ? val : formatValue(val);
+
+          if (formData[field.key] === formattedValue) return;
           formData[field.key] = formattedValue;
 
-          // Update the store
           const storeKey = field.storeKey || field.key;
 
-          // Special case for percentage values stored as fractions
-          const storeValue =
-            field.unit === '%' && storeKey.includes('Fraction') && formattedValue > 1
-              ? formattedValue / 100
-              : formattedValue;
+          // Convert percentage to fraction for usable battery
+          const storeValue = field.key === 'usableFraction' ? formattedValue / 100 : formattedValue;
 
           updateStore(storeKey as keyof CalculatorData, storeValue);
           saveAndCalculate();
@@ -161,7 +178,7 @@
 
   // Helper function to save data and calculate results
   function saveAndCalculate(): void {
-    if (isInitialized) {
+    if (isInitialized && isFormDataValid()) {
       calculateResults();
     }
   }
@@ -169,16 +186,19 @@
   // Calculate results using the provided function
   function calculateResults(): void {
     try {
-      // Reset error state
       error = null;
 
       // Only calculate if all required values are valid
       if (isFormDataValid()) {
+        // Convert usableFraction to decimal for calculation
+        const calculationData = { ...formData };
+        if ('usableFraction' in calculationData) {
+          calculationData.usableFraction = Number(calculationData.usableFraction) / 100;
+        }
+
         // Use the provided calculation function
-        results = calculateFn(formData as Record<string, number>);
+        results = calculateFn(calculationData as Record<string, number>);
         updateTips();
-      } else {
-        resetResults();
       }
     } catch (err) {
       console.error('Calculation error:', err);
@@ -214,11 +234,6 @@
 
   // StatsComponent will be passed as a prop
   const StatsComponent = statsComponent;
-
-  // Update store with new value
-  function updateStore(key: keyof CalculatorData, value: number | string) {
-    calculatorStore.updateValue(key, value);
-  }
 </script>
 
 {#if error}

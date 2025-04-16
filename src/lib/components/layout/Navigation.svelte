@@ -5,16 +5,16 @@
   const currentPath = $derived(page.url.pathname);
 </script>
 
-<nav class="flex items-center justify-between py-4">
+<nav class="flex items-center justify-between px-5 py-4">
   <div class="flex items-center gap-8">
     <a href="/" class="text-lg font-semibold">EV Estimator Hub</a>
 
     <ul class="flex gap-4">
       <li>
         <a
-          href="/"
-          class="link-hover link {currentPath === '/' ? 'link-primary' : ''}"
-          aria-current={currentPath === '/' ? 'page' : undefined}
+          href="/frequency"
+          class="link-hover link {currentPath === '/frequency' ? 'link-primary' : ''}"
+          aria-current={currentPath === '/frequency' ? 'page' : undefined}
         >
           Charge Frequency
         </a>

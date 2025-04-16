@@ -12,17 +12,18 @@
       label: 'Charging Type',
       key: 'chargingType',
       storeKey: 'chargingType',
+      type: 'radio' as const,
       options: [
         { value: 'AC', label: 'AC Charging (Home/Destination)' },
         { value: 'DC', label: 'DC Fast Charging' }
-      ],
-      type: 'radio' as const
+      ]
     },
     {
       id: 'battery-capacity',
       label: 'Battery Capacity',
       key: 'batteryKwh',
       storeKey: 'batteryKwh',
+      type: 'range' as const,
       min: INPUT_RANGES.BATTERY_CAPACITY.MIN,
       max: INPUT_RANGES.BATTERY_CAPACITY.MAX,
       step: INPUT_RANGES.BATTERY_CAPACITY.STEP,
@@ -34,6 +35,7 @@
       label: 'Initial Charge',
       key: 'initialCharge',
       storeKey: 'initialCharge',
+      type: 'range' as const,
       min: INPUT_RANGES.BATTERY_CHARGE.MIN,
       max: INPUT_RANGES.BATTERY_CHARGE.MAX,
       step: INPUT_RANGES.BATTERY_CHARGE.STEP,
@@ -45,18 +47,19 @@
       label: 'Target Charge',
       key: 'targetCharge',
       storeKey: 'targetCharge',
+      type: 'range' as const,
       min: INPUT_RANGES.BATTERY_CHARGE.MIN,
       max: INPUT_RANGES.BATTERY_CHARGE.MAX,
       step: INPUT_RANGES.BATTERY_CHARGE.STEP,
       unit: '%',
       allowDecimals: false
     },
-
     {
       id: 'charging-power',
       label: 'Charging Power',
       key: 'chargingPower',
       storeKey: 'chargingPower',
+      type: 'range' as const,
       min: INPUT_RANGES.CHARGING_POWER.MIN,
       max: INPUT_RANGES.CHARGING_POWER.MAX,
       step: INPUT_RANGES.CHARGING_POWER.STEP,
@@ -68,6 +71,7 @@
       label: 'Charging Efficiency',
       key: 'chargingEfficiency',
       storeKey: 'chargingEfficiency',
+      type: 'range' as const,
       min: INPUT_RANGES.CHARGING_EFFICIENCY.MIN,
       max: INPUT_RANGES.CHARGING_EFFICIENCY.MAX,
       step: INPUT_RANGES.CHARGING_EFFICIENCY.STEP,
@@ -79,6 +83,7 @@
       label: 'Battery Temperature',
       key: 'temperatureC',
       storeKey: 'temperatureC',
+      type: 'range' as const,
       min: INPUT_RANGES.TEMPERATURE.MIN,
       max: INPUT_RANGES.TEMPERATURE.MAX,
       step: INPUT_RANGES.TEMPERATURE.STEP,
@@ -90,6 +95,7 @@
       label: 'Charging Phases',
       key: 'phases',
       storeKey: 'phases',
+      type: 'range' as const,
       min: INPUT_RANGES.PHASES.MIN,
       max: INPUT_RANGES.PHASES.MAX,
       step: INPUT_RANGES.PHASES.STEP,
@@ -100,39 +106,40 @@
 
   // Calculate function
   function calculateResults(formData: Record<string, number | string>) {
-    const {
-      batteryKwh,
-      initialCharge,
-      targetCharge,
-      chargingPower,
-      chargingEfficiency,
-      temperatureC,
-      phases,
-      chargingType = 'AC'
-    } = formData;
+    // Ensure all numeric values are properly converted
+    const params = {
+      batteryKwh: Number(formData.batteryKwh),
+      initialCharge: Number(formData.initialCharge),
+      targetCharge: Number(formData.targetCharge),
+      chargingPower: Number(formData.chargingPower),
+      chargingEfficiency: Number(formData.chargingEfficiency),
+      temperatureC: Number(formData.temperatureC),
+      phases: Number(formData.phases),
+      chargingType: formData.chargingType as 'AC' | 'DC'
+    };
 
-    return calculateChargingTime({
-      batteryKwh: Number(batteryKwh),
-      initialCharge: Number(initialCharge),
-      targetCharge: Number(targetCharge),
-      chargingPower: Number(chargingPower),
-      chargingEfficiency: Number(chargingEfficiency),
-      temperatureC: Number(temperatureC),
-      phases: Number(phases),
-      chargingType: chargingType as 'AC' | 'DC'
-    });
+    // Validate input values
+    if (params.initialCharge >= params.targetCharge) {
+      throw new Error('Target charge must be higher than initial charge');
+    }
+
+    if (params.chargingPower <= 0) {
+      throw new Error('Charging power must be greater than 0');
+    }
+
+    return calculateChargingTime(params);
   }
 
   // Tips function
   function getTips(data: Record<string, any>) {
     return getChargingTimeTips({
-      batteryKwh: data.batteryKwh,
-      initialCharge: data.initialCharge,
-      targetCharge: data.targetCharge,
-      chargingPower: data.chargingPower,
-      chargingEfficiency: data.chargingEfficiency,
-      temperatureC: data.temperatureC,
-      phases: data.phases,
+      batteryKwh: Number(data.batteryKwh),
+      initialCharge: Number(data.initialCharge),
+      targetCharge: Number(data.targetCharge),
+      chargingPower: Number(data.chargingPower),
+      chargingEfficiency: Number(data.chargingEfficiency),
+      temperatureC: Number(data.temperatureC),
+      phases: Number(data.phases),
       chargingTimeHours: data.chargingTimeHours,
       chargingTimeMinutes: data.chargingTimeMinutes,
       actualChargingPower: data.actualChargingPower,

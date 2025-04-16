@@ -9,10 +9,14 @@ export function load() {
   if (browser) {
     try {
       const themeState = get(themeStore);
-      const calculatorState = get(calculatorStore);
-      theme = themeState.current === 'system' ? themeState.system : themeState.current;
+      theme =
+        themeState.current === 'system'
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light'
+          : themeState.current;
     } catch (error) {
-      console.error('Failed to load data from storage:', error);
+      console.error('Failed to load theme from storage:', error);
     }
   }
 

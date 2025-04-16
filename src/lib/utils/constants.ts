@@ -67,9 +67,9 @@ export const INPUT_RANGES = {
 
   // Usable battery percentage
   USABLE_BATTERY: {
-    MIN: 0.5,
-    MAX: 1,
-    STEP: 0.01
+    MIN: 0,
+    MAX: 100,
+    STEP: 1
   },
 
   // Battery charge percentage

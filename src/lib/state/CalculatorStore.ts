@@ -1,7 +1,8 @@
 import { BaseStore, type BaseStoreOptions } from './BaseStore';
 import { STORAGE_KEYS } from '$lib/utils/storage';
 import type { CalculatorData } from '$lib/types/calculator';
-import { DEFAULT_CALCULATOR, DEFAULT_VALUES } from '$lib/utils/constants';
+import { DEFAULT_CALCULATOR } from '$lib/utils/constants';
+
 function validateCalculatorData(data: unknown): data is CalculatorData {
   if (!data || typeof data !== 'object') return false;
 
@@ -32,7 +33,7 @@ class CalculatorStore extends BaseStore<CalculatorData> {
   constructor() {
     const options: BaseStoreOptions<CalculatorData> = {
       key: STORAGE_KEYS.CALCULATOR,
-      initialValue: DEFAULT_VALUES.CALCULATOR,
+      initialValue: DEFAULT_CALCULATOR,
       validate: validateCalculatorData
     };
     super(options);
@@ -43,7 +44,7 @@ class CalculatorStore extends BaseStore<CalculatorData> {
   }
 
   resetToDefaults(): void {
-    this.reset(DEFAULT_VALUES.CALCULATOR);
+    this.reset(DEFAULT_CALCULATOR);
   }
 }
 
