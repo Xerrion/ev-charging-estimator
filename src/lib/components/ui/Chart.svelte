@@ -45,7 +45,7 @@
   onMount(() => {
     if (canvas) {
       // Deep clone the config to avoid Svelte reactivity issues with Chart.js
-      const chartConfig = JSON.parse(JSON.stringify(config));
+      const chartConfig = structuredClone(config);
       chart = new Chart(canvas, chartConfig);
     }
   });
@@ -54,8 +54,8 @@
   $effect(() => {
     if (chart && config) {
       // Deep clone to break Svelte's reactivity and avoid property descriptor errors
-      const newData = JSON.parse(JSON.stringify(config.data));
-      const newOptions = JSON.parse(JSON.stringify(config.options || {}));
+      const newData = structuredClone(config.data);
+      const newOptions = structuredClone(config.options || {});
       
       chart.data = newData;
       chart.options = newOptions;
