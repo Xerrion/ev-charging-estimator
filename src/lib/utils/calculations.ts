@@ -1,14 +1,26 @@
 /**
  * Utility functions for EV charging calculations
+ *
+ * These calculations are based on real-world EV charging physics and industry standards:
+ * - Battery chemistry limitations (C-rate, temperature effects)
+ * - Grid power limitations (phase-based AC charging)
+ * - Charging curve behavior (progressive slowdown at high state of charge)
+ * - Realistic efficiency losses and emissions data
  */
 
-// Constants
-const MAX_POWER_PER_PHASE = 7.4; // Maximum power per phase for typical home installations (kW)
-const MAX_AC_POWER = 22.2; // Maximum power for AC charging (3 phases * 7.4 kW)
-const MAX_DC_POWER = 350; // Maximum power for DC fast charging (kW)
+// Constants based on real-world charging infrastructure and battery limitations
+const MAX_POWER_PER_PHASE = 7.4; // Maximum power per phase for typical home installations (kW) - EU standard
+const MAX_AC_POWER = 22.2; // Maximum power for AC charging (3 phases * 7.4 kW) - most home chargers max out here
+const MAX_DC_POWER = 350; // Maximum power for DC fast charging (kW) - current ultra-fast charger limit
 
 /**
  * Calculates the effective range of an EV in kilometers
+ *
+ * Formula: Effective Range = (Battery Capacity × Usable Fraction) / Consumption × 100
+ *
+ * @param usableFraction - Default 0.9 (90%) accounts for battery buffer maintained by BMS
+ *   Most EVs reserve 5-10% at the top and bottom of the battery for longevity
+ *   Real-world usable capacity typically ranges from 85-95% of advertised capacity
  */
 export function calculateEffectiveRange({
   batteryKwh,
@@ -117,11 +129,21 @@ export function calculateAnnualChargingCost({
 
 /**
  * Calculates the CO2 emissions saved compared to a gasoline vehicle
+ *
+ * Default values are based on real-world data:
+ * - Gasoline: 120 g/km (realistic for modern efficient gasoline cars in EU; US average is higher at ~180-250 g/km)
+ * - Electricity: 50 g/km (realistic for average grid mix; varies from 5-10 g/km in clean grids like Norway
+ *   to 90-100 g/km in coal-heavy grids)
+ *
+ * Note: EV emissions depend heavily on the electricity grid's carbon intensity.
+ * Clean grids (renewable/nuclear): 5-30 g/km
+ * Average grids (mixed): 50-90 g/km
+ * Coal-heavy grids: 90-120 g/km
  */
 export function calculateCO2Savings({
   weeklyDistanceKm,
   gasolineEmissionsGramPerKm = 120,
-  electricityEmissionsGramPerKm = 30
+  electricityEmissionsGramPerKm = 50
 }: {
   weeklyDistanceKm: number;
   gasolineEmissionsGramPerKm?: number;
@@ -252,6 +274,16 @@ export function calculateChargingTime({
 /**
  * Divides the charging process into segments based on state of charge levels,
  * applying different charging speeds to each segment
+ *
+ * This models the real-world charging curve where:
+ * - 0-50%: Full speed charging (multiplier: 1.0) - battery can accept maximum current
+ * - 50-70%: Slight slowdown (multiplier: 0.9) - tapering begins
+ * - 70-80%: Moderate slowdown (multiplier: 0.7) - voltage rising, current reducing
+ * - 80-90%: Significant slowdown (multiplier: 0.4) - cell balancing, heat management
+ * - 90-100%: Severe slowdown (multiplier: 0.2) - constant voltage phase, very slow final charge
+ *
+ * Based on industry data showing that charging from 80-100% can take as long
+ * as charging from 0-80%, despite being only 20% of capacity.
  */
 function segmentCharging(
   initialCharge: number,
@@ -305,7 +337,18 @@ function applyPhaseLimitation(requestedPower: number, phases: number): number {
 
 /**
  * Returns a multiplier for charging speed based on battery temperature
- * Cold batteries charge significantly slower due to chemistry limitations
+ *
+ * Cold batteries charge significantly slower due to chemistry limitations:
+ * - At low temperatures, lithium-ion mobility is reduced
+ * - Risk of lithium plating increases when charging cold batteries too fast
+ * - Battery Management System (BMS) limits current to protect cells
+ *
+ * Real-world data shows:
+ * - Below -10°C: Charging can be 2-3x slower (multiplier: 0.3-0.5)
+ * - At 0°C: Charging is 1.5-2x slower (multiplier: 0.5-0.7)
+ * - At 10°C: Charging is 1.1-1.3x slower (multiplier: 0.8)
+ * - 20-30°C: Optimal charging temperature (multiplier: 1.0)
+ * - Above 40°C: Slight reduction to manage heat (multiplier: 0.9)
  */
 function getTemperatureMultiplier(temperatureC: number): number {
   if (temperatureC < -10) return 0.3; // Extreme cold, severe reduction
@@ -325,7 +368,16 @@ export function validateTechnicalLimits(batteryKwh: number, chargingPower: numbe
 
 /**
  * Calculates the maximum charging power based on battery capacity and C-rate limits
- * Most EVs have battery protection systems that limit the maximum charging rate
+ *
+ * Most EVs have battery protection systems that limit the maximum charging rate to prevent:
+ * - Overheating and thermal runaway
+ * - Lithium plating (which degrades battery capacity)
+ * - Premature battery aging
+ *
+ * Real-world C-rate limits:
+ * - Most EVs: 1-2C continuous charging (safe for longevity)
+ * - High-performance EVs: Up to 3C in optimal conditions (upper safety limit)
+ * - 3C is used here as the maximum safe charging rate for modern lithium-ion batteries
  */
 function getMaxChargingPower(batteryKwh: number): number {
   // Modern EVs generally limit to 3C for safety and longevity
