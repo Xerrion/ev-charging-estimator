@@ -1,8 +1,10 @@
 <script lang="ts">
   import Stats from '$lib/components/ui/Stats.svelte';
-  import { formatTime, generateChargingTimeStats } from '$lib/utils/calculations';
+  import { formatTime, generateChargingTimeStats, generateChargingCurveData } from '$lib/utils/calculations';
   import Alert from '$lib/components/ui/Alert.svelte';
   import Card from '$lib/components/ui/Card.svelte';
+  import Chart from '$lib/components/ui/Chart.svelte';
+  import type { ChartConfiguration } from 'chart.js';
 
   type Result = {
     chargingTimeHours: number;
@@ -34,11 +36,21 @@
       chargingPower: number;
       chargingEfficiency: number;
       phases: number;
+      temperatureC: number;
+      chargingType: 'AC' | 'DC';
     };
     title?: string;
   }>();
 
   let stats = $state<StatItem[]>([]);
+  let chartConfig = $state<ChartConfiguration>({
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: []
+    },
+    options: {}
+  });
 
   $effect(() => {
     // Generate the standard stats
@@ -63,6 +75,95 @@
     }
 
     stats = baseStats;
+
+    // Generate charging curve data for the graph
+    const curveData = generateChargingCurveData({
+      batteryKwh: formData.batteryKwh,
+      initialCharge: formData.initialCharge,
+      targetCharge: formData.targetCharge,
+      chargingPower: formData.chargingPower,
+      chargingEfficiency: formData.chargingEfficiency,
+      temperatureC: formData.temperatureC,
+      phases: formData.phases,
+      chargingType: formData.chargingType
+    });
+
+    // Update chart configuration
+    chartConfig = {
+      type: 'line',
+      data: {
+        labels: curveData.map(d => d.time.toString()),
+        datasets: [
+          {
+            label: 'Battery Charge Level (%)',
+            data: curveData.map(d => d.charge),
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 0,
+            borderWidth: 2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              title: (items) => {
+                const minutes = parseInt(items[0].label);
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                if (hours > 0) {
+                  return `${hours}h ${mins}m`;
+                }
+                return `${mins} minutes`;
+              },
+              label: (context) => {
+                return `${context.parsed.y.toFixed(1)}% charged`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Time (minutes)'
+            },
+            ticks: {
+              callback: function(value, index) {
+                const minutes = parseInt(this.getLabelForValue(value as number));
+                if (minutes === 0) return '0';
+                if (minutes % 60 === 0) {
+                  return `${minutes / 60}h`;
+                }
+                return '';
+              },
+              maxTicksLimit: 10
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Battery Charge (%)'
+            },
+            min: Math.max(0, formData.initialCharge - 5),
+            max: Math.min(100, formData.targetCharge + 5),
+            ticks: {
+              callback: function(value) {
+                return value + '%';
+              }
+            }
+          }
+        }
+      }
+    };
   });
 
   // Helper function to generate a description based on the limiting factor
@@ -89,6 +190,12 @@
 
 <Card {title}>
   <Stats {stats} />
+
+  <!-- Charging Curve Graph -->
+  <div class="mt-6">
+    <h3 class="text-lg font-semibold mb-3">Charging Progress Over Time</h3>
+    <Chart config={chartConfig} height="300px" />
+  </div>
 
   {#if results.technicalLimitExceeded}
     <Alert

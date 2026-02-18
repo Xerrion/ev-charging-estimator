@@ -2,7 +2,9 @@
   import Alert from '$lib/components/ui/Alert.svelte';
   import Card from '$lib/components/ui/Card.svelte';
   import Stats from '$lib/components/ui/Stats.svelte';
+  import Chart from '$lib/components/ui/Chart.svelte';
   import { generateFrequencyStats, isSafetyChargeAdded } from '$lib/utils/calculations';
+  import type { ChartConfiguration } from 'chart.js';
 
   type Result = {
     effectiveRangeKm: number;
@@ -35,6 +37,14 @@
 
   let stats = $state<StatItem[]>([]);
   let safetyChargeAdded = $state(false);
+  let chartConfig = $state<ChartConfiguration>({
+    type: 'bar',
+    data: {
+      labels: [],
+      datasets: []
+    },
+    options: {}
+  });
 
   $effect(() => {
     // Check if a safety charge was added
@@ -50,11 +60,76 @@
       co2Savings: results.co2Savings,
       safetyChargeAdded
     });
+
+    // Generate chart data
+    const dailyDistanceKm = formData.weeklyDistanceKm / 7;
+    const rangePerCharge = results.effectiveRangeKm;
+    
+    chartConfig = {
+      type: 'bar',
+      data: {
+        labels: ['Weekly Distance', 'Vehicle Range', 'Range per Charge'],
+        datasets: [
+          {
+            label: 'Kilometers',
+            data: [formData.weeklyDistanceKm, results.effectiveRangeKm, results.effectiveRangeKm / results.weeklyCharges],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.6)',
+              'rgba(75, 192, 192, 0.6)',
+              'rgba(54, 162, 235, 0.6)'
+            ],
+            borderColor: [
+              'rgb(255, 99, 132)',
+              'rgb(75, 192, 192)',
+              'rgb(54, 162, 235)'
+            ],
+            borderWidth: 2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                return `${context.parsed.y.toFixed(1)} km`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Distance (km)'
+            },
+            ticks: {
+              callback: function(value) {
+                return value + ' km';
+              }
+            }
+          }
+        }
+      }
+    };
   });
 </script>
 
 <Card {title}>
   <Stats {stats} />
+  
+  <!-- Range Comparison Graph -->
+  <div class="mt-6">
+    <h3 class="text-lg font-semibold mb-3">Distance and Range Comparison</h3>
+    <Chart config={chartConfig} height="300px" />
+  </div>
+
   {#if safetyChargeAdded}
     <Alert
       type="warning"
