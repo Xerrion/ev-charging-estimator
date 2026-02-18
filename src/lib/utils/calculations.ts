@@ -139,6 +139,10 @@ export function calculateAnnualChargingCost({
  * Clean grids (renewable/nuclear): 5-30 g/km
  * Average grids (mixed): 50-90 g/km
  * Coal-heavy grids: 90-120 g/km
+ *
+ * IMPORTANT: In regions with coal-heavy grids (90-120 g/km), EVs may provide minimal or no
+ * emissions savings compared to efficient gasoline cars. The environmental benefit of EVs
+ * is highly location-dependent and greatest in areas with clean electricity generation.
  */
 export function calculateCO2Savings({
   weeklyDistanceKm,
