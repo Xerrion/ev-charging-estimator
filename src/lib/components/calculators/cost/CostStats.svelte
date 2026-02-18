@@ -68,16 +68,8 @@
             {
               label: `Cost (${displayCurrency})`,
               data: [results.weeklyCost, results.monthlyCost, results.annualCost],
-              backgroundColor: [
-                'rgba(54, 162, 235, 0.6)',
-                'rgba(75, 192, 192, 0.6)',
-                'rgba(153, 102, 255, 0.6)'
-              ],
-              borderColor: [
-                'rgb(54, 162, 235)',
-                'rgb(75, 192, 192)',
-                'rgb(153, 102, 255)'
-              ],
+              backgroundColor: ['rgba(54, 162, 235, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)'],
+              borderColor: ['rgb(54, 162, 235)', 'rgb(75, 192, 192)', 'rgb(153, 102, 255)'],
               borderWidth: 2
             }
           ]
@@ -92,7 +84,7 @@
             tooltip: {
               callbacks: {
                 label: (context) => {
-                  return `${displayCurrency} ${context.parsed.y.toFixed(2)}`;
+                  return `${displayCurrency} ${context.parsed.y?.toFixed(2) ?? 0}`;
                 }
               }
             }
@@ -105,7 +97,7 @@
                 text: `Cost (${displayCurrency})`
               },
               ticks: {
-                callback: function(value) {
+                callback: function (value) {
                   return displayCurrency + ' ' + value;
                 }
               }
@@ -160,22 +152,22 @@
 {#if title}
   <Card {title}>
     <Stats {stats} />
-    
+
     {#if !hasError && results.costPerCharge > 0}
       <!-- Cost Breakdown Graph -->
       <div class="mt-6">
-        <h3 class="text-lg font-semibold mb-3">Cost Breakdown Over Time</h3>
+        <h3 class="mb-3 text-lg font-semibold">Cost Breakdown Over Time</h3>
         <Chart config={chartConfig} height="300px" />
       </div>
     {/if}
   </Card>
 {:else}
   <Stats {stats} />
-  
+
   {#if !hasError && results.costPerCharge > 0}
     <!-- Cost Breakdown Graph -->
     <div class="mt-6">
-      <h3 class="text-lg font-semibold mb-3">Cost Breakdown Over Time</h3>
+      <h3 class="mb-3 text-lg font-semibold">Cost Breakdown Over Time</h3>
       <Chart config={chartConfig} height="300px" />
     </div>
   {/if}

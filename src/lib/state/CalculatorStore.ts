@@ -49,3 +49,4 @@ class CalculatorStore extends BaseStore<CalculatorData> {
 }
 
 export const calculatorStore = new CalculatorStore();
+export type { CalculatorData };

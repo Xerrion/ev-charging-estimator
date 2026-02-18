@@ -92,11 +92,11 @@
     chartConfig = {
       type: 'line',
       data: {
-        labels: curveData.map(d => d.time.toString()),
+        labels: curveData.map((d) => d.time.toString()),
         datasets: [
           {
             label: 'Battery Charge Level (%)',
-            data: curveData.map(d => d.charge),
+            data: curveData.map((d) => d.charge),
             borderColor: 'rgb(75, 192, 192)',
             backgroundColor: 'rgba(75, 192, 192, 0.1)',
             tension: 0.4,
@@ -125,7 +125,7 @@
                 return `${mins} minutes`;
               },
               label: (context) => {
-                return `${context.parsed.y.toFixed(1)}% charged`;
+                return `${context.parsed.y?.toFixed(1) ?? 0}% charged`;
               }
             }
           }
@@ -137,7 +137,7 @@
               text: 'Time (minutes)'
             },
             ticks: {
-              callback: function(value, index) {
+              callback: function (value, index) {
                 const minutes = parseInt(this.getLabelForValue(value as number));
                 if (minutes === 0) return '0';
                 if (minutes % 60 === 0) {
@@ -156,7 +156,7 @@
             min: Math.max(0, formData.initialCharge - 5),
             max: Math.min(100, formData.targetCharge + 5),
             ticks: {
-              callback: function(value) {
+              callback: function (value) {
                 return value + '%';
               }
             }
@@ -193,7 +193,7 @@
 
   <!-- Charging Curve Graph -->
   <div class="mt-6">
-    <h3 class="text-lg font-semibold mb-3">Charging Progress Over Time</h3>
+    <h3 class="mb-3 text-lg font-semibold">Charging Progress Over Time</h3>
     <Chart config={chartConfig} height="300px" />
   </div>
 

@@ -863,13 +863,13 @@ export function generateChargingCurveData({
   chargingType?: 'AC' | 'DC';
 }): Array<{ time: number; charge: number }> {
   const dataPoints: Array<{ time: number; charge: number }> = [];
-  
+
   // Start at initial charge
   dataPoints.push({ time: 0, charge: initialCharge });
-  
+
   // Calculate actual charging power with all limitations
   let powerLimit = chargingPower;
-  
+
   if (chargingType === 'AC') {
     powerLimit = applyPhaseLimitation(chargingPower, phases);
   } else {
@@ -877,49 +877,49 @@ export function generateChargingCurveData({
       powerLimit = MAX_DC_POWER;
     }
   }
-  
+
   const technicalLimit = getMaxChargingPower(batteryKwh);
   let actualChargingPower = Math.min(powerLimit, technicalLimit);
-  
+
   // Apply temperature effects
   const temperatureMultiplier = getTemperatureMultiplier(temperatureC);
   actualChargingPower = actualChargingPower * temperatureMultiplier;
-  
+
   // Ensure minimum charging power
   if (actualChargingPower < 0.1) {
     actualChargingPower = 0.1;
   }
-  
+
   // Get charging segments
   const segments = segmentCharging(initialCharge, targetCharge);
-  
+
   let cumulativeTimeMinutes = 0;
-  
+
   // Generate data points for each segment
   for (const segment of segments) {
     const segmentSizePercent = segment.end - segment.start;
     const segmentEnergyKwh = (batteryKwh * segmentSizePercent) / 100 / (chargingEfficiency / 100);
     const speedMultiplier = segment.speedMultiplier;
-    
+
     const segmentTimeHours = segmentEnergyKwh / (actualChargingPower * speedMultiplier);
     const segmentTimeMinutes = segmentTimeHours * 60;
-    
+
     // Create intermediate points for smooth curve
     const numPoints = Math.max(2, Math.ceil(segmentSizePercent / 5)); // At least 2 points, more for larger segments
-    
+
     for (let i = 1; i <= numPoints; i++) {
       const progress = i / numPoints;
-      const charge = segment.start + (segmentSizePercent * progress);
-      const time = cumulativeTimeMinutes + (segmentTimeMinutes * progress);
-      
+      const charge = segment.start + segmentSizePercent * progress;
+      const time = cumulativeTimeMinutes + segmentTimeMinutes * progress;
+
       dataPoints.push({
         time: Math.round(time),
         charge: Math.round(charge * 10) / 10 // Round to 1 decimal
       });
     }
-    
+
     cumulativeTimeMinutes += segmentTimeMinutes;
   }
-  
+
   return dataPoints;
 }

@@ -64,7 +64,7 @@
     // Generate chart data
     const dailyDistanceKm = formData.weeklyDistanceKm / 7;
     const rangePerCharge = results.effectiveRangeKm;
-    
+
     chartConfig = {
       type: 'bar',
       data: {
@@ -72,17 +72,13 @@
         datasets: [
           {
             label: 'Kilometers',
-            data: [formData.weeklyDistanceKm, results.effectiveRangeKm, results.effectiveRangeKm / results.weeklyCharges],
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.6)',
-              'rgba(75, 192, 192, 0.6)',
-              'rgba(54, 162, 235, 0.6)'
+            data: [
+              formData.weeklyDistanceKm,
+              results.effectiveRangeKm,
+              results.effectiveRangeKm / results.weeklyCharges
             ],
-            borderColor: [
-              'rgb(255, 99, 132)',
-              'rgb(75, 192, 192)',
-              'rgb(54, 162, 235)'
-            ],
+            backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(54, 162, 235, 0.6)'],
+            borderColor: ['rgb(255, 99, 132)', 'rgb(75, 192, 192)', 'rgb(54, 162, 235)'],
             borderWidth: 2
           }
         ]
@@ -97,7 +93,7 @@
           tooltip: {
             callbacks: {
               label: (context) => {
-                return `${context.parsed.y.toFixed(1)} km`;
+                return `${context.parsed.y?.toFixed(1) ?? 0} km`;
               }
             }
           }
@@ -110,7 +106,7 @@
               text: 'Distance (km)'
             },
             ticks: {
-              callback: function(value) {
+              callback: function (value) {
                 return value + ' km';
               }
             }
@@ -123,10 +119,10 @@
 
 <Card {title}>
   <Stats {stats} />
-  
+
   <!-- Range Comparison Graph -->
   <div class="mt-6">
-    <h3 class="text-lg font-semibold mb-3">Distance and Range Comparison</h3>
+    <h3 class="mb-3 text-lg font-semibold">Distance and Range Comparison</h3>
     <Chart config={chartConfig} height="300px" />
   </div>
 

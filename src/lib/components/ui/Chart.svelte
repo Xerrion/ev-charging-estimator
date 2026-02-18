@@ -31,10 +31,7 @@
     Filler
   );
 
-  let {
-    config,
-    height = '300px'
-  } = $props<{
+  let { config, height = '300px' } = $props<{
     config: ChartConfiguration;
     height?: string;
   }>();
@@ -56,7 +53,7 @@
       // Deep clone to break Svelte's reactivity and avoid property descriptor errors
       const newData = structuredClone(config.data);
       const newOptions = structuredClone(config.options || {});
-      
+
       chart.data = newData;
       chart.options = newOptions;
       chart.update('none'); // Update without animation for real-time feel

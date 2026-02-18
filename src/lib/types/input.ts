@@ -77,10 +77,10 @@ export interface NumberInputConfig extends BaseInputConfig {
 }
 
 // Union type for all input configurations
-export type InputConfig = 
-  | RangeInputConfig 
-  | SelectInputConfig 
-  | RadioInputConfig 
+export type InputConfig =
+  | RangeInputConfig
+  | SelectInputConfig
+  | RadioInputConfig
   | CheckboxInputConfig
   | TextInputConfig
   | NumberInputConfig;
