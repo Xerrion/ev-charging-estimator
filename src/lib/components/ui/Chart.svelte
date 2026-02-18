@@ -11,6 +11,8 @@
     Tooltip,
     Legend,
     Filler,
+    BarController,
+    BarElement,
     type ChartConfiguration
   } from 'chart.js';
 
@@ -21,6 +23,8 @@
     PointElement,
     LinearScale,
     CategoryScale,
+    BarController,
+    BarElement,
     Title,
     Tooltip,
     Legend,
@@ -40,15 +44,21 @@
 
   onMount(() => {
     if (canvas) {
-      chart = new Chart(canvas, config);
+      // Deep clone the config to avoid Svelte reactivity issues with Chart.js
+      const chartConfig = JSON.parse(JSON.stringify(config));
+      chart = new Chart(canvas, chartConfig);
     }
   });
 
   // Update chart when config changes
   $effect(() => {
     if (chart && config) {
-      chart.data = config.data;
-      chart.options = config.options || {};
+      // Deep clone to break Svelte's reactivity and avoid property descriptor errors
+      const newData = JSON.parse(JSON.stringify(config.data));
+      const newOptions = JSON.parse(JSON.stringify(config.options || {}));
+      
+      chart.data = newData;
+      chart.options = newOptions;
       chart.update('none'); // Update without animation for real-time feel
     }
   });
