@@ -48,16 +48,19 @@
     if (obj === null || typeof obj !== 'object') {
       return obj;
     }
-    if (typeof obj === 'function') {
-      return obj; // Preserve functions
-    }
     if (Array.isArray(obj)) {
       return obj.map(item => cloneConfig(item));
     }
     const cloned: any = {};
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
-        cloned[key] = cloneConfig(obj[key]);
+        const value = obj[key];
+        // Preserve functions (callbacks) as-is
+        if (typeof value === 'function') {
+          cloned[key] = value;
+        } else {
+          cloned[key] = cloneConfig(value);
+        }
       }
     }
     return cloned;
