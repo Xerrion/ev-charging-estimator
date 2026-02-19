@@ -125,7 +125,9 @@
                 return `${mins} minutes`;
               },
               label: (context) => {
-                return `${context.parsed.y.toFixed(1)}% charged`;
+                const value = context.parsed.y;
+                if (value === null || value === undefined) return '';
+                return `${value.toFixed(1)}% charged`;
               }
             }
           }

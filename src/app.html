@@ -16,26 +16,29 @@
       }
     </style>
     <script>
-      (function() {
+      (function () {
         document.documentElement.classList.add('theme-initializing');
         try {
           const stored = localStorage.getItem('theme');
           let theme = 'light';
-          
+
           if (stored) {
             const data = JSON.parse(stored);
-            theme = data.current === 'system' 
-              ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-              : data.current;
+            theme =
+              data.current === 'system'
+                ? window.matchMedia('(prefers-color-scheme: dark)').matches
+                  ? 'dark'
+                  : 'light'
+                : data.current;
           }
-          
+
           document.documentElement.setAttribute('data-theme', theme);
 
           // Wait for styles to be applied and then show content
-          window.addEventListener('load', function() {
+          window.addEventListener('load', function () {
             // Add a small delay to ensure styles are properly applied
-            setTimeout(function() {
-              requestAnimationFrame(function() {
+            setTimeout(function () {
+              requestAnimationFrame(function () {
                 document.documentElement.classList.remove('theme-initializing');
               });
             }, 150); // Small delay to ensure proper theme application

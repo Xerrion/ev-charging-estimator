@@ -97,7 +97,9 @@
           tooltip: {
             callbacks: {
               label: (context) => {
-                return `${context.parsed.y.toFixed(1)} km`;
+                const value = context.parsed.y;
+                if (value === null || value === undefined) return '';
+                return `${value.toFixed(1)} km`;
               }
             }
           }

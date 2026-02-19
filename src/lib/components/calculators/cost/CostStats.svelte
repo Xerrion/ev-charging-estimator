@@ -92,7 +92,9 @@
             tooltip: {
               callbacks: {
                 label: (context) => {
-                  return `${displayCurrency} ${context.parsed.y.toFixed(2)}`;
+                  const value = context.parsed.y;
+                  if (value === null || value === undefined) return '';
+                  return `${displayCurrency} ${value.toFixed(2)}`;
                 }
               }
             }

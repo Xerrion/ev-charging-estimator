@@ -32,10 +32,10 @@
       seoData.title = 'EV Charge Frequency Calculator | EV Estimator Hub';
       seoData.description =
         'Calculate how many times you need to charge your electric vehicle per week based on your driving habits';
-    } else if (pathname === '/charging-time') {
+    } else if (pathname === '/calculators/charging-time') {
       seoData.title = 'EV Charging Time Calculator | EV Estimator Hub';
       seoData.description = 'Calculate how long it will take to charge your electric vehicle from any state of charge';
-    } else if (pathname === '/cost') {
+    } else if (pathname === '/calculators/cost') {
       seoData.title = 'EV Charging Cost Calculator | EV Estimator Hub';
       seoData.description = 'Calculate the cost of charging your electric vehicle at home or at public stations';
     }

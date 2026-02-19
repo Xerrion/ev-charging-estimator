@@ -42,10 +42,35 @@
   let canvas: HTMLCanvasElement;
   let chart: Chart | null = null;
 
+  // Custom clone function that preserves functions (unlike structuredClone)
+  // This is needed because Chart.js configs contain callback functions
+  function cloneConfig(obj: any): any {
+    if (obj === null || typeof obj !== 'object') {
+      return obj;
+    }
+    if (Array.isArray(obj)) {
+      return obj.map(item => cloneConfig(item));
+    }
+    const cloned: any = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const value = obj[key];
+        // Preserve functions (callbacks) as-is
+        if (typeof value === 'function') {
+          cloned[key] = value;
+        } else {
+          cloned[key] = cloneConfig(value);
+        }
+      }
+    }
+    return cloned;
+  }
+
   onMount(() => {
     if (canvas) {
-      // Deep clone the config to avoid Svelte reactivity issues with Chart.js
-      const chartConfig = structuredClone(config);
+      // Clone the config to avoid Svelte reactivity issues with Chart.js
+      // We use a custom clone that preserves functions (callbacks)
+      const chartConfig = cloneConfig(config);
       chart = new Chart(canvas, chartConfig);
     }
   });
@@ -53,9 +78,9 @@
   // Update chart when config changes
   $effect(() => {
     if (chart && config) {
-      // Deep clone to break Svelte's reactivity and avoid property descriptor errors
-      const newData = structuredClone(config.data);
-      const newOptions = structuredClone(config.options || {});
+      // Clone to break Svelte's reactivity while preserving callback functions
+      const newData = cloneConfig(config.data);
+      const newOptions = cloneConfig(config.options || {});
       
       chart.data = newData;
       chart.options = newOptions;
